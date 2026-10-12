@@ -1,0 +1,51 @@
+Cria uma landing page de ficheiro único chamada index.html (CSS e JS inline, sem frameworks, sem bibliotecas, sem pedidos externos, sem imagens externas) para ser aberta por QR code em telemóveis de gama baixa em Moçambique. Mobile-first (360px de largura), usa 100dvh, fontes do sistema. Peso total abaixo de 40 KB.
+
+OBJECTIVO
+Protótipo para testar a mecânica: captar lead (nome + contacto), depois o cliente abre uma caixa de presente que revela a bebida que ganhou e o link para a levantar no bar. Nesta fase NADA é guardado: sem base de dados, sem localStorage, sem envio de dados. O nome fica só em memória para aparecer na mensagem final.
+
+TEMA VISUAL
+Nocturno/lunar para o "Lunar Viewpoint Bar": fundo azul-marinho muito escuro, estrelas subtis em CSS, uma lua com brilho suave, acentos em dourado/prata. Limpo, sem poluição visual, botões grandes e legíveis.
+
+FLUXO (3 ecrãs, transições suaves entre eles)
+1. FORMULÁRIO: título curto, campo Nome, campo Contacto (WhatsApp), botão grande "Receber o meu presente". Validação: nome com pelo menos 2 caracteres; contacto moçambicano de 9 dígitos a começar por 82, 83, 84, 85, 86 ou 87 (aceitar prefixo +258 ou 258 opcional). Mensagens de erro curtas debaixo do campo.
+2. CAIXA DE PRESENTE: depois de validar, o formulário sai com fade e a caixa aparece a flutuar suavemente, com um brilho a pulsar e o texto "Toca para abrir".
+3. REVELAÇÃO: ao tocar, a caixa treme levemente, a tampa levanta e inclina, sai um feixe de luz, e a caixa EXPLODE em partículas (cerca de 36, douradas e prateadas) com um flash suave. Da explosão sobe a bebida ganha, com escala e fade. Depois aparecem, em cascata: a mensagem, um código de resgate e o botão do mapa.
+
+TEXTO DO ECRÃ DE REVELAÇÃO (português de Moçambique, curto, sem gerúndios)
+- Linha 1: "Parabéns, {nome}!"
+- Linha 2: "Ganhaste uma {bebida}."
+- Linha 3: "Mostra este ecrã ao balcão para levantar."
+- Código de resgate: formato LUA-#### (4 dígitos aleatórios), apresentado com destaque.
+- Botão grande: "Ver localização" que abre MAPS_URL num novo separador.
+
+BLOCO DE CONFIGURAÇÃO NO TOPO DO SCRIPT (para eu editar facilmente)
+- BAR_NAME = "Lunar Viewpoint Bar"
+- MAPS_URL = "https://maps.app.goo.gl/ayv2exDpN5ERwa2P7"
+- PRIZES = lista de 3 prémios, cada um com: id, nome, peso (probabilidade relativa, todos iguais por agora), cores principais e a função que devolve o SVG.
+  Prémios: "2M" (lata), "Corona", "Heineken".
+- Sorteio aleatório ponderado pelo peso.
+- Para testar: se o URL tiver ?prize=corona (ou 2m, heineken), força esse prémio.
+
+IMAGENS DAS BEBIDAS
+Desenha as 3 bebidas em SVG inline, desenhadas à mão no código, sem ficheiros externos e sem reproduzir logótipos ou rótulos oficiais das marcas. O reconhecimento vem da forma, da cor e do nome em texto por baixo:
+- 2M: lata, cor principal definida no bloco de configuração (começa com um azul-escuro e branco, eu ajusto depois).
+- Corona: garrafa transparente com cerveja dourada e uma rodela de lima no gargalo.
+- Heineken: garrafa verde.
+Cada SVG com brilho/reflexo simples para parecer apetitoso.
+
+REGRAS DE ANIMAÇÃO (fluidez a 60fps)
+- Animar apenas transform e opacity. Nunca width, height, top, left, margin.
+- Usar will-change com moderação e só nos elementos que animam.
+- Partículas: criadas no momento da explosão, animadas com transform/opacity (Web Animations API ou CSS), e removidas do DOM no fim.
+- Respeitar prefers-reduced-motion: sem explosão nem tremor, ir directo para a revelação com um fade simples.
+- Evitar cliques duplos: depois de tocar na caixa, ignorar novos toques.
+- Botões com área de toque de pelo menos 48px.
+
+ACESSIBILIDADE E ROBUSTEZ
+- Contraste alto nos textos, labels reais nos campos, inputmode="tel" no contacto, autocomplete adequado.
+- Tem de funcionar offline depois de carregar.
+
+QUANDO TERMINARES
+1. Abre um servidor local para eu ver no browser.
+2. Diz-me o tamanho final do ficheiro em KB.
+3. Diz-me em que linhas ficam o bloco de configuração e a cor da lata da 2M.

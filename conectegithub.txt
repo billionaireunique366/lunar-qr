@@ -1,0 +1,1 @@
+Inicializa um repositório git nesta pasta, cria um .gitignore, faz o primeiro commit e cria no GitHub um repositório chamado lunar-qr (privado) na conta billionaireunique366, depois faz push para a branch main. Se faltar o GitHub CLI (gh) ou o login, diz-me exactamente o que instalar ou autorizar, em vez de tentar contornar.
