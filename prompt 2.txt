@@ -1,0 +1,71 @@
+Contexto: tenho um index.html (landing page do Lunar Viewpoint Bar, aberta por QR code em telemóveis de gama baixa em Moçambique). Fluxo actual: formulário (nome + WhatsApp) → caixa de presente → explosão de partículas → revelação da bebida ganha + código LUA-#### + botão "Ver localização". Estamos na FASE DE INTERFACE: sem backend, nada é guardado. Não mexas na lógica do formulário, da validação, das animações da caixa nem das partículas, a não ser onde este prompt pede.
+
+OBJECTIVO DESTA FASE
+Trocar os 3 prémios desenhados em SVG (2M, Corona, Heineken) por 18 bebidas reais, com as imagens oficiais que te dou abaixo.
+
+1. DESCARREGAR E OPTIMIZAR AS IMAGENS
+- Descarrega cada URL da lista para uma pasta de trabalho com curl -L. Confirma que cada ficheiro é mesmo uma imagem (com `file` ou a ler os primeiros bytes) e não uma página HTML de erro do Imgur. Se alguma falhar, tenta mais uma vez e depois continua, e no fim diz-me quais falharam.
+- Processa com sharp (Node), instalado via npm:
+  - corta as margens transparentes ou vazias (trim);
+  - redimensiona para 360px de altura máxima, mantendo a proporção;
+  - converte para WebP com transparência, qualidade 80;
+  - grava em img/<id>.webp, ao lado do index.html.
+- Objectivo de peso: menos de 25 KB por imagem. Se alguma passar, baixa a qualidade até caber.
+- Verifica se cada PNG original tem fundo transparente. Se alguma tiver fundo branco ou de cor, NÃO tentes remover o fundo: lista-as no fim para eu substituir a imagem.
+
+2. LISTA DE PRÉMIOS (id | nome no ecrã | frase | URL)
+2m-grande | 2M Grande | uma 2M Grande | https://i.imgur.com/6kT7vEu.png
+2m-lata | 2M Lata | uma 2M Lata | https://i.imgur.com/AhGDJsR.png
+2m-txoti | 2M Txoti | uma 2M Txoti | https://i.imgur.com/aZZF83X.png
+brutal-fruit-garrafa | Brutal Fruit | uma Brutal Fruit | https://i.imgur.com/KfMl205.png
+brutal-fruit-lata | Brutal Fruit Lata | uma Brutal Fruit Lata | https://i.imgur.com/JhZV8q9.png
+castle-lite | Castle Lite | uma Castle Lite | https://i.imgur.com/GiVE8Bb.png
+corona-extra | Corona Extra | uma Corona Extra | https://i.imgur.com/o6oIcBv.png
+heineken-lata | Heineken Lata | uma Heineken Lata | https://i.imgur.com/U3Nw7Pp.png
+heineken-txoti | Heineken Txoti | uma Heineken Txoti | https://i.imgur.com/ejeudLi.png
+impala-milho-lata | Impala Milho Lata | uma Impala Milho Lata | https://i.imgur.com/sJ4RE6u.png
+impala-mandioca-grande | Impala Mandioca Grande | uma Impala Mandioca Grande | https://i.imgur.com/xRVga7z.png
+impala-milho-grande | Impala Milho Grande | uma Impala Milho Grande | https://i.imgur.com/ro1Qbbs.png
+impala-milho-txoti | Impala Milho Txoti | uma Impala Milho Txoti | https://i.imgur.com/os3yAGD.png
+jc-le-roux-la-fleurette | J.C. Le Roux La Fleurette | um J.C. Le Roux La Fleurette | https://i.imgur.com/0Xk2wDP.png
+jc-le-roux-le-domaine | J.C. Le Roux Le Domaine | um J.C. Le Roux Le Domaine | https://i.imgur.com/8eLn0qU.png
+jc-le-roux-sauvignon-light | J.C. Le Roux Sauvignon Blanc Light | um J.C. Le Roux Sauvignon Blanc Light | https://i.imgur.com/Ydejl7H.png
+laurentina-preta | Laurentina Preta | uma Laurentina Preta | https://i.imgur.com/2Mm2vEg.png
+txilar-lata | Txilar Lata | uma Txilar Lata | https://i.imgur.com/EqVr9qU.png
+
+3. NOVO BLOCO DE CONFIGURAÇÃO (no topo do script, fácil de editar)
+Substitui o array PRIZES actual por este formato:
+{ id, name, phrase, type: "bebida", img: "img/<id>.webp", weight: 1 }
+- O campo type prepara a próxima fase (desconto, ticket, VIP, enigma). Para já, todos são "bebida".
+- Todos os pesos ficam a 1 por agora. Põe um comentário a explicar que o peso é a probabilidade relativa.
+- A linha 2 da revelação passa a ser "Ganhaste " + phrase + "." em vez de "Ganhaste uma {nome}." O nome do prémio continua por cima, em maiúsculas douradas, como já está.
+- Mantém o sorteio ponderado e o teste ?prize=<id> (ainda estamos em fase de interface).
+
+4. CARREGAMENTO DA IMAGEM
+- Não carregues as 18 imagens no arranque. A página inicial tem de continuar leve.
+- O sorteio já acontece no submit do formulário. Nesse momento, faz o pré-carregamento SÓ da imagem sorteada (new Image() + decode() quando existir). A pessoa fica no ecrã da caixa pelo menos 1–2 segundos, e é esse o tempo de carregamento.
+- Se a imagem ainda não tiver carregado quando a caixa explode, espera no máximo 1,5 s extra com o brilho da caixa a pulsar e depois revela de qualquer forma.
+- Se a imagem falhar (sem rede, por exemplo), mostra um SVG genérico de garrafa (desenha um simples, neutro, sem marca) com o nome do prémio por baixo. Remove as funções antigas canSVG, coronaSVG e heinekenSVG.
+- Coloca a imagem num <img> com alt = nome da bebida, width e height definidos para não haver salto de layout, decoding="async".
+
+5. ALINHAMENTO VISUAL
+- As imagens têm proporções muito diferentes (latas baixas e largas, garrafas grandes, garrafas de vinho altas). Coloca-as todas num contentor de altura fixa (a altura actual do .prize: 28vh, mín. 130px, máx. 210px) com object-fit: contain e alinhadas pela base, para que todas "assentem" no mesmo chão.
+- Mantém a pequena sombra elíptica por baixo da bebida.
+- PERFORMANCE: remove o filter: drop-shadow do .prize. Substitui-o por um halo dourado feito com radial-gradient num pseudo-elemento por trás da imagem (só opacity e transform animam). O filter durante a animação de escala é o ponto mais pesado em GPUs fracas.
+- Remove o will-change das 36 partículas (.fx i), porque a Web Animations API já trata disso.
+
+6. MODO GALERIA (só para eu rever o visual)
+- Se o URL tiver ?galeria=1, salta o fluxo e mostra uma grelha (2 colunas em 360px) com as 18 bebidas, cada uma no contentor de revelação real (mesma altura, mesmo halo, mesma sombra) e com o nome e a frase por baixo.
+- Neste modo, carrega todas as imagens com loading="lazy".
+
+7. REGRAS QUE SE MANTÊM
+- Mobile-first 360px, 100dvh, fontes do sistema, CSS e JS inline no index.html.
+- O index.html sozinho tem de ficar abaixo de 40 KB (as imagens não contam para este limite).
+- Só animar transform e opacity. Respeitar prefers-reduced-motion. Protecção contra duplo toque.
+- Nada é guardado (sem localStorage, sem envio de dados).
+
+QUANDO TERMINARES
+1. Abre um servidor local e dá-me os links: fluxo normal, ?prize=jc-le-roux-le-domaine e ?galeria=1.
+2. Tira capturas de ecrã a 360×640 do modo galeria e de 3 revelações (uma lata, uma garrafa grande, um J.C. Le Roux) e mostra-mas.
+3. Diz-me: o tamanho do index.html em KB, o peso de cada WebP, o total da pasta img/, quais imagens falharam no download e quais não tinham fundo transparente.
+4. Diz-me em que linhas fica o bloco de configuração.

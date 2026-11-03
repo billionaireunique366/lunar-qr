@@ -146,14 +146,34 @@ form .btn{margin-top:6px}
 
 /* Partículas e flash */
 .fx{position:fixed;top:0;left:0;width:0;height:0;z-index:20;pointer-events:none}
-.fx i{position:absolute;top:0;left:0;display:block;border-radius:50%;will-change:transform,opacity}
+.fx i{position:absolute;top:0;left:0;display:block;border-radius:50%}
 #flash{position:fixed;top:0;left:0;right:0;bottom:0;z-index:19;pointer-events:none;opacity:0}
 #flash.go{animation:flash .75s ease-out}
 @keyframes flash{0%{opacity:0}18%{opacity:1}100%{opacity:0}}
 
 /* Revelação */
-.prize{height:28vh;max-height:210px;min-height:130px;margin:0 auto 6px}
-.prize svg{height:100%;width:auto;display:block;margin:0 auto;filter:drop-shadow(0 0 18px rgba(246,212,130,.35))}
+/* Contentor da bebida: altura fixa, imagem assente na base */
+.prize{position:relative;height:28vh;max-height:210px;min-height:130px;margin:0 auto 6px}
+.prize::before{ /* halo dourado (substitui o drop-shadow) */
+  content:"";position:absolute;top:-6%;bottom:-6%;left:50%;width:240px;margin-left:-120px;z-index:0;pointer-events:none;
+  background:radial-gradient(closest-side,rgba(246,212,130,.42),rgba(246,212,130,.12) 55%,rgba(246,212,130,0));
+}
+.prize::after{ /* sombra elíptica no chão */
+  content:"";position:absolute;bottom:-4px;left:50%;width:84px;height:10px;margin-left:-42px;z-index:0;border-radius:50%;
+  background:radial-gradient(closest-side,rgba(0,0,0,.55),rgba(0,0,0,0));
+}
+.prize img,.prize svg{position:relative;z-index:1;display:block;width:100%;height:100%;object-fit:contain;object-position:50% 100%}
+#s3.on .prize::before{animation:halo 2.6s ease-in-out 1s infinite alternate}
+@keyframes halo{from{opacity:.75;transform:scale(.94)}to{opacity:1;transform:scale(1.04)}}
+
+/* Galeria (?galeria=1) */
+#s4{justify-content:flex-start}
+.gal{display:grid;grid-template-columns:1fr 1fr;gap:26px 12px;width:100%;max-width:360px;margin:0 auto;padding-bottom:24px}
+.gal .card{min-width:0}
+.gal .prize{margin-bottom:12px;overflow:visible}
+.gal .prize::before{width:170px;margin-left:-85px}
+.gal .pname{font-size:.72rem;letter-spacing:.12em;margin:0 0 3px}
+.gal .phr{margin:0;font-size:.82rem;color:#c9cfe2;line-height:1.3}
 .pname{font-size:.95rem;font-weight:700;letter-spacing:.24em;text-transform:uppercase;color:#e8c26a;margin:0 0 14px}
 h2{font-size:1.7rem;margin:0 0 6px;line-height:1.2}
 .won{font-size:1.2rem;margin:0 0 6px;color:#fff}
@@ -176,7 +196,7 @@ h2{font-size:1.7rem;margin:0 0 6px;line-height:1.2}
 @keyframes fade{from{opacity:0}to{opacity:1}}
 
 @media (prefers-reduced-motion:reduce){
-  .sky::after,.moon::after,.float,.halo,.hint{animation:none}
+  .sky::after,.moon::after,.float,.halo,.hint,#s3.on .prize::before{animation:none}
   .screen,.screen.on{transform:none}
   #s3.on .prize,#s3.on .rv{animation:fade .6s ease-out both;animation-delay:0s}
 }
@@ -239,6 +259,15 @@ h2{font-size:1.7rem;margin:0 0 6px;line-height:1.2}
       <a class="btn rv" id="map" target="_blank" rel="noopener">Ver localização</a>
     </div>
   </section>
+
+  <!-- Galeria (só com ?galeria=1) -->
+  <section id="s4" class="screen">
+    <div class="inner">
+      <p class="brand" data-bar></p>
+      <h1 tabindex="-1">Galeria de prémios</h1>
+      <div class="gal" id="gal"></div>
+    </div>
+  </section>
 </main>
 
 <script>
@@ -246,78 +275,59 @@ h2{font-size:1.7rem;margin:0 0 6px;line-height:1.2}
 var BAR_NAME = "Lunar Viewpoint Bar";
 var MAPS_URL = "https://maps.app.goo.gl/ayv2exDpN5ERwa2P7";
 
+/* weight = probabilidade relativa. Todos a 1 = mesma hipótese para todos.
+   Ex.: um prémio com weight 2 sai o dobro das vezes de um com weight 1.
+   type prepara a próxima fase (desconto, ticket, vip, enigma); por agora tudo "bebida".
+   Teste: ?prize=<id> força o prémio; ?galeria=1 mostra todos. */
 var PRIZES = [
-  {
-    id: "2m", name: "2M", weight: 1,
-    colors: { body: "#0d2a6e", band: "#ffffff", text: "#0d2a6e" }, // cor da lata 2M
-    svg: function (c) { return canSVG(c); }
-  },
-  {
-    id: "corona", name: "Corona", weight: 1,
-    colors: { beerLight: "#ffd45e", beerDark: "#d48a0e", lime: "#4f9a2a", limeFlesh: "#c8e86b" },
-    svg: function (c) { return coronaSVG(c); }
-  },
-  {
-    id: "heineken", name: "Heineken", weight: 1,
-    colors: { glassLight: "#34b062", glassDark: "#0a3f1b", cap: "#cfd5dd" },
-    svg: function (c) { return heinekenSVG(c); }
-  }
+  { id: "2m-grande", name: "2M Grande", phrase: "uma 2M Grande", type: "bebida", img: "img/2m-grande.webp", weight: 1 },
+  { id: "2m-lata", name: "2M Lata", phrase: "uma 2M Lata", type: "bebida", img: "img/2m-lata.webp", weight: 1 },
+  { id: "2m-txoti", name: "2M Txoti", phrase: "uma 2M Txoti", type: "bebida", img: "img/2m-txoti.webp", weight: 1 },
+  { id: "brutal-fruit-garrafa", name: "Brutal Fruit", phrase: "uma Brutal Fruit", type: "bebida", img: "img/brutal-fruit-garrafa.webp", weight: 1 },
+  { id: "brutal-fruit-lata", name: "Brutal Fruit Lata", phrase: "uma Brutal Fruit Lata", type: "bebida", img: "img/brutal-fruit-lata.webp", weight: 1 },
+  { id: "castle-lite", name: "Castle Lite", phrase: "uma Castle Lite", type: "bebida", img: "img/castle-lite.webp", weight: 1 },
+  { id: "corona-extra", name: "Corona Extra", phrase: "uma Corona Extra", type: "bebida", img: "img/corona-extra.webp", weight: 1 },
+  { id: "heineken-lata", name: "Heineken Lata", phrase: "uma Heineken Lata", type: "bebida", img: "img/heineken-lata.webp", weight: 1 },
+  { id: "heineken-txoti", name: "Heineken Txoti", phrase: "uma Heineken Txoti", type: "bebida", img: "img/heineken-txoti.webp", weight: 1 },
+  { id: "impala-milho-lata", name: "Impala Milho Lata", phrase: "uma Impala Milho Lata", type: "bebida", img: "img/impala-milho-lata.webp", weight: 1 },
+  { id: "impala-mandioca-grande", name: "Impala Mandioca Grande", phrase: "uma Impala Mandioca Grande", type: "bebida", img: "img/impala-mandioca-grande.webp", weight: 1 },
+  { id: "impala-milho-grande", name: "Impala Milho Grande", phrase: "uma Impala Milho Grande", type: "bebida", img: "img/impala-milho-grande.webp", weight: 1 },
+  { id: "impala-milho-txoti", name: "Impala Milho Txoti", phrase: "uma Impala Milho Txoti", type: "bebida", img: "img/impala-milho-txoti.webp", weight: 1 },
+  { id: "jc-le-roux-la-fleurette", name: "J.C. Le Roux La Fleurette", phrase: "um J.C. Le Roux La Fleurette", type: "bebida", img: "img/jc-le-roux-la-fleurette.webp", weight: 1 },
+  { id: "jc-le-roux-le-domaine", name: "J.C. Le Roux Le Domaine", phrase: "um J.C. Le Roux Le Domaine", type: "bebida", img: "img/jc-le-roux-le-domaine.webp", weight: 1 },
+  { id: "jc-le-roux-sauvignon-light", name: "J.C. Le Roux Sauvignon Blanc Light", phrase: "um J.C. Le Roux Sauvignon Blanc Light", type: "bebida", img: "img/jc-le-roux-sauvignon-light.webp", weight: 1 },
+  { id: "laurentina-preta", name: "Laurentina Preta", phrase: "uma Laurentina Preta", type: "bebida", img: "img/laurentina-preta.webp", weight: 1 },
+  { id: "txilar-lata", name: "Txilar Lata", phrase: "uma Txilar Lata", type: "bebida", img: "img/txilar-lata.webp", weight: 1 }
 ];
 /* ============================================================== */
 
-/* ---------- Desenhos SVG (sem logótipos nem rótulos oficiais) ---------- */
-var BOTTLE = "M50 8h20v6h-2v62c0 14 30 26 30 52v118c0 8-6 12-14 12H36c-8 0-14-4-14-12V128c0-26 30-38 30-52V14h-2z";
-var SHINE = '<rect x="32" y="136" width="7" height="104" rx="3.5" fill="#fff" opacity=".45"/>' +
-            '<rect x="54" y="20" width="3" height="52" rx="1.5" fill="#fff" opacity=".4"/>' +
-            '<rect x="82" y="140" width="3" height="90" rx="1.5" fill="#fff" opacity=".18"/>';
-function svgOpen(h) { return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 ' + h + '" role="img" focusable="false">'; }
-function shadow(y) { return '<ellipse cx="60" cy="' + y + '" rx="42" ry="5" fill="#000" opacity=".35"/>'; }
+/* ---------- Imagem do prémio ---------- */
+var IMG_W = 210, IMG_H = 360; // caixa de referência (o CSS fixa a altura do contentor)
 
-function canSVG(c) {
-  return svgOpen(240) +
-    '<defs><linearGradient id="cS" x1="0" x2="1"><stop offset="0" stop-color="#7d8592"/><stop offset=".3" stop-color="#f4f6f8"/><stop offset=".6" stop-color="#b9c0c9"/><stop offset="1" stop-color="#666d79"/></linearGradient>' +
-    '<linearGradient id="cL" x1="0" x2="1"><stop offset="0" stop-opacity=".4"/><stop offset=".22" stop-color="#fff" stop-opacity=".35"/><stop offset=".42" stop-color="#fff" stop-opacity="0"/><stop offset=".75" stop-opacity="0"/><stop offset="1" stop-opacity=".45"/></linearGradient></defs>' +
-    shadow(232) +
-    '<rect x="24" y="14" width="72" height="18" rx="7" fill="url(#cS)"/>' +
-    '<rect x="18" y="26" width="84" height="186" rx="12" fill="' + c.body + '"/>' +
-    '<rect x="18" y="92" width="84" height="62" fill="' + c.band + '"/>' +
-    '<text x="60" y="137" text-anchor="middle" font-family="Arial Black,Arial,sans-serif" font-weight="900" font-size="38" fill="' + c.text + '">2M</text>' +
-    '<rect x="22" y="206" width="76" height="16" rx="7" fill="url(#cS)"/>' +
-    '<rect x="18" y="26" width="84" height="186" rx="12" fill="url(#cL)"/>' +
-    '<rect x="29" y="34" width="6" height="170" rx="3" fill="#fff" opacity=".45"/>' +
-    '<g fill="#fff" opacity=".65"><circle cx="80" cy="58" r="2.2"/><circle cx="70" cy="176" r="1.8"/><circle cx="88" cy="190" r="2.5"/><circle cx="46" cy="70" r="1.5"/><circle cx="84" cy="74" r="1.3"/></g>' +
+// Garrafa genérica, sem marca, para quando a imagem não carrega
+function fallbackSVG(name) {
+  var t = String(name).replace(/[&<>"]/g, function (ch) { return "&#" + ch.charCodeAt(0) + ";"; });
+  // nomes longos partem em 2 linhas
+  var w = t.split(" "), half = Math.ceil(w.length / 2);
+  var label = t.length > 16
+    ? '<tspan x="80">' + w.slice(0, half).join(" ") + '</tspan><tspan x="80" dy="17">' + w.slice(half).join(" ") + '</tspan>'
+    : t;
+  return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 320" role="img" aria-label="' + t + '" focusable="false">' +
+    '<defs><linearGradient id="fg" x1="0" x2="1"><stop offset="0" stop-color="#6b5a2e"/><stop offset=".35" stop-color="#d9b25a"/><stop offset="1" stop-color="#5a4a24"/></linearGradient></defs>' +
+    '<path d="M68 10h24v8h-2v58c0 14 30 26 30 52v118c0 8-6 12-14 12H54c-8 0-14-4-14-12V128c0-26 30-38 30-52V18h-2z" fill="url(#fg)" stroke="#f6e3a8" stroke-opacity=".6" stroke-width="2"/>' +
+    '<rect x="50" y="138" width="7" height="104" rx="3.5" fill="#fff" opacity=".4"/>' +
+    '<text x="80" y="292" text-anchor="middle" font-family="system-ui,Arial,sans-serif" font-size="14" font-weight="700" fill="#f6d98e">' + label + '</text>' +
     '</svg>';
 }
 
-function coronaSVG(c) {
-  return svgOpen(270) +
-    '<defs><clipPath id="kC"><path d="' + BOTTLE + '"/></clipPath>' +
-    '<linearGradient id="kB" x1="0" x2="1"><stop offset="0" stop-color="' + c.beerDark + '"/><stop offset=".38" stop-color="' + c.beerLight + '"/><stop offset="1" stop-color="' + c.beerDark + '"/></linearGradient></defs>' +
-    shadow(262) +
-    '<g clip-path="url(#kC)"><rect width="120" height="270" fill="#fff8e0" opacity=".16"/>' +
-    '<rect y="64" width="120" height="210" fill="url(#kB)"/>' +
-    '<rect y="58" width="120" height="8" fill="#fffbe9" opacity=".9"/>' +
-    '<g fill="#fff" opacity=".55"><circle cx="48" cy="200" r="1.6"/><circle cx="66" cy="170" r="1.3"/><circle cx="58" cy="120" r="1.4"/><circle cx="72" cy="226" r="1.8"/><circle cx="62" cy="92" r="1.1"/></g></g>' +
-    '<path d="' + BOTTLE + '" fill="none" stroke="#fdf6dc" stroke-opacity=".75" stroke-width="2"/>' +
-    SHINE +
-    '<g transform="translate(60 11) rotate(-22)"><circle r="16" fill="' + c.lime + '"/><circle r="13" fill="' + c.limeFlesh + '"/>' +
-    '<path d="M0-12V12M-12 0H12M-8.5-8.5L8.5 8.5M8.5-8.5L-8.5 8.5" stroke="#eef9c4" stroke-width="1.3"/><circle r="2.2" fill="#eef9c4"/></g>' +
-    '</svg>';
-}
-
-function heinekenSVG(c) {
-  return svgOpen(270) +
-    '<defs><linearGradient id="kH" x1="0" x2="1"><stop offset="0" stop-color="' + c.glassDark + '"/><stop offset=".32" stop-color="' + c.glassLight + '"/><stop offset=".6" stop-color="#1c7a3a"/><stop offset="1" stop-color="' + c.glassDark + '"/></linearGradient>' +
-    '<linearGradient id="kM" x1="0" x2="1"><stop offset="0" stop-color="#8b929c"/><stop offset=".4" stop-color="' + c.cap + '"/><stop offset="1" stop-color="#7a818b"/></linearGradient>' +
-    '<clipPath id="kG"><path d="' + BOTTLE + '"/></clipPath></defs>' +
-    shadow(262) +
-    '<path d="' + BOTTLE + '" fill="url(#kH)"/>' +
-    '<rect y="74" width="120" height="200" fill="#000" opacity=".18" clip-path="url(#kG)"/>' +
-    '<path d="' + BOTTLE + '" fill="none" stroke="#7be0a0" stroke-opacity=".35" stroke-width="1.5"/>' +
-    SHINE +
-    '<rect x="46" y="2" width="28" height="15" rx="3" fill="url(#kM)"/>' +
-    '<path d="M48 17v-3M53 17v-3M58 17v-3M63 17v-3M68 17v-3M72 17v-3" stroke="#6f7680" stroke-width="1.2"/>' +
-    '</svg>';
+function makeImg(p, lazy) {
+  var im = new Image();
+  im.alt = p.name;
+  im.width = IMG_W;
+  im.height = IMG_H;
+  im.setAttribute("decoding", "async");
+  if (lazy) im.setAttribute("loading", "lazy");
+  return im;
 }
 
 /* ---------- Lógica ---------- */
@@ -380,14 +390,48 @@ function heinekenSVG(c) {
 
     userName = n; // só em memória
     prize = pickPrize();
-    $("art").innerHTML = prize.svg(prize.colors);
+    preload(prize);
     $("pname").textContent = prize.name;
     $("t3").textContent = "Parabéns, " + userName + "!";
-    $("won").innerHTML = "Ganhaste uma <b></b>.";
-    $("won").querySelector("b").textContent = prize.name;
+    $("won").innerHTML = "Ganhaste <b></b>.";
+    $("won").querySelector("b").textContent = prize.phrase;
     $("code").textContent = "LUA-" + ("000" + Math.floor(Math.random() * 10000)).slice(-4);
     show("s2");
   });
+
+  // Pré-carrega só a imagem sorteada; enquanto isso a pessoa está no ecrã da caixa
+  var artReady = false, onArt = null;
+  function setArt(p, im) {
+    var art = $("art");
+    art.innerHTML = "";
+    if (im) art.appendChild(im); else art.innerHTML = fallbackSVG(p.name);
+  }
+  function preload(p) {
+    var im = makeImg(p), settled = false;
+    function finish(ok) {
+      if (settled) return;
+      settled = true;
+      setArt(p, ok ? im : null);
+      artReady = true;
+      if (onArt) { var f = onArt; onArt = null; f(); }
+    }
+    im.onload = function () {
+      if (im.decode) im.decode().then(function () { finish(true); }, function () { finish(true); });
+      else finish(true);
+    };
+    im.onerror = function () { finish(false); };
+    im.src = p.img;
+  }
+  // Corre fn quando a imagem estiver pronta, ou ao fim de maxMs (com a garrafa genérica)
+  function whenArt(fn, maxMs) {
+    if (artReady) return fn();
+    var t = setTimeout(function () {
+      onArt = null;
+      if (!$("art").firstChild) setArt(prize, null); // a imagem real substitui-a se chegar depois
+      fn();
+    }, maxMs);
+    onArt = function () { clearTimeout(t); fn(); };
+  }
 
   function burst(x, y) {
     if (!document.body.animate) return;
@@ -423,11 +467,13 @@ function heinekenSVG(c) {
     if (opened) return;
     opened = true;
     gift.setAttribute("aria-disabled", "true");
-    if (reduced) { show("s3"); return; }
+    if (reduced) { whenArt(function () { show("s3"); }, 1500); return; }
 
     stage.classList.add("shake");
     setTimeout(function () { stage.classList.add("open"); }, 480);
-    setTimeout(function () {
+    // Se a imagem ainda não chegou, a caixa fica aberta a pulsar até 1,5 s extra
+    setTimeout(function () { whenArt(explode, 1500); }, 1150);
+    function explode() {
       var r = $("box").getBoundingClientRect();
       var x = r.left + r.width / 2, y = r.top + r.height / 3;
       var fl = $("flash");
@@ -436,8 +482,29 @@ function heinekenSVG(c) {
       burst(x, y);
       stage.classList.add("gone");
       show("s3");
-    }, 1150);
+    }
   });
+
+  // Modo galeria (?galeria=1): só para rever o visual das 18 bebidas
+  if (/[?&]galeria=1(&|#|$)/.test(location.search)) {
+    var gal = $("gal");
+    for (var g = 0; g < PRIZES.length; g++) {
+      var p = PRIZES[g], card = document.createElement("div"), box = document.createElement("div");
+      card.className = "card";
+      box.className = "prize";
+      var im = makeImg(p, true);
+      im.onerror = (function (bx, pr) { return function () { bx.innerHTML = fallbackSVG(pr.name); }; })(box, p);
+      im.src = p.img;
+      box.appendChild(im);
+      card.appendChild(box);
+      var nm = document.createElement("p"), ph = document.createElement("p");
+      nm.className = "pname"; nm.textContent = p.name;
+      ph.className = "phr"; ph.textContent = "Ganhaste " + p.phrase + ".";
+      card.appendChild(nm); card.appendChild(ph);
+      gal.appendChild(card);
+    }
+    show("s4");
+  }
 })();
 </script>
 </body>
