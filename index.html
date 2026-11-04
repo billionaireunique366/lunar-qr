@@ -56,13 +56,13 @@ body{
 /* Ecrãs */
 .screen{
   position:absolute;top:0;left:0;right:0;bottom:0;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  display:flex;flex-direction:column;align-items:center;
   padding:24px 20px;overflow-y:auto;text-align:center;
   opacity:0;visibility:hidden;transform:translateY(14px);
   transition:opacity .5s ease,transform .5s ease,visibility 0s linear .5s;
 }
 .screen.on{opacity:1;visibility:visible;transform:none;transition:opacity .5s ease .15s,transform .5s ease .15s,visibility 0s}
-.inner{width:100%;max-width:360px}
+.inner{width:100%;max-width:360px;margin:auto} /* margin:auto centra sem cortar o topo quando há scroll */
 h1,h2{outline:none}
 .brand{font-size:.78rem;letter-spacing:.22em;text-transform:uppercase;color:#d9c08a;margin:0 0 10px}
 h1{font-size:1.65rem;line-height:1.2;margin:0 0 8px;font-weight:700}
@@ -166,8 +166,78 @@ form .btn{margin-top:6px}
 #s3.on .prize::before{animation:halo 2.6s ease-in-out 1s infinite alternate}
 @keyframes halo{from{opacity:.75;transform:scale(.94)}to{opacity:1;transform:scale(1.04)}}
 
+/* Logo */
+.logo{display:block;margin:0 auto}
+.logo img{display:block;width:auto;height:100%;margin:0 auto}
+.logo.off{display:none}
+
+/* 0. Pré-página */
+#s0 .logo{height:120px;margin-bottom:44px}
+.start{
+  position:relative;display:flex;align-items:center;justify-content:center;width:96px;height:96px;margin:0 auto;padding:0;
+  border:0;border-radius:50%;cursor:pointer;color:#1a1430;
+  background:linear-gradient(180deg,#f6d98e,#e2b453);
+  box-shadow:0 8px 26px rgba(226,180,83,.35),inset 0 1px 0 rgba(255,255,255,.6);
+}
+.start::before{
+  content:"";position:absolute;top:-10px;left:-10px;right:-10px;bottom:-10px;border-radius:50%;
+  border:2px solid rgba(246,217,142,.7);animation:ring 2s ease-out infinite;
+}
+@keyframes ring{from{transform:scale(.9);opacity:.9}to{transform:scale(1.35);opacity:0}}
+.start svg{width:40px;height:40px;margin-left:6px}
+.start:active{transform:scale(.96)}
+.start:focus-visible,.pb:focus-visible{outline:3px solid #fff;outline-offset:3px}
+.cap{margin:26px 0 0;font-size:1.15rem;font-weight:600;color:#f3e3b6}
+
+/* Ecrã 1 mais compacto (cabe em 360×640 com logo e player) */
+#s1{padding:14px 20px}
+#s1 .logo{height:64px;margin-bottom:8px}
+#s1 .brand{margin-bottom:6px}
+#s1 h1{font-size:1.4rem;margin-bottom:4px}
+#s1 .sub{margin-bottom:12px;font-size:.95rem}
+#s1 .field{margin-bottom:6px}
+#s1 input{min-height:48px;padding:10px 14px}
+#s1 .err{margin-top:3px}
+#s1 form .btn{margin-top:4px}
+
+/* Player de áudio */
+.player{
+  display:flex;align-items:center;gap:8px;width:100%;margin:0 0 12px;padding:6px 6px 6px 8px;text-align:left;
+  background:rgba(255,255,255,.07);border:1px solid rgba(232,194,106,.4);border-radius:40px;
+}
+.player.hide{display:none}
+.pb{
+  position:relative;flex:none;display:flex;align-items:center;justify-content:center;width:48px;height:48px;padding:0;
+  border:0;border-radius:50%;cursor:pointer;color:#1a1430;background:linear-gradient(180deg,#f6d98e,#e2b453);
+}
+.pb svg{width:22px;height:22px}
+.pb.rep{background:none;color:#f3e3b6}
+.pb .i-pause,.pb .spin,.is-playing .pb .i-play,.is-loading .pb .i-play{display:none}
+.is-playing .pb .i-pause{display:block}
+.is-loading .pb .spin{display:block}
+.spin{width:22px;height:22px;border:3px solid rgba(26,20,48,.25);border-top-color:#1a1430;border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.is-nudge .pb.main::before{
+  content:"";position:absolute;top:-5px;left:-5px;right:-5px;bottom:-5px;border-radius:50%;
+  border:2px solid rgba(246,217,142,.8);animation:ring 1.6s ease-out infinite;
+}
+.eq{flex:none;display:flex;align-items:flex-end;gap:3px;height:20px}
+.eq i{display:block;width:3px;height:20px;border-radius:2px;background:#e8c26a;transform-origin:50% 100%;transform:scaleY(.25)}
+.is-playing .eq i{animation:eq .9s ease-in-out infinite alternate}
+.eq i:nth-child(2){animation-delay:-.3s}
+.eq i:nth-child(3){animation-delay:-.6s}
+.eq i:nth-child(4){animation-delay:-.15s}
+@keyframes eq{from{transform:scaleY(.25)}to{transform:scaleY(1)}}
+.ptrack{flex:1;min-width:0}
+.pbar{height:6px;border-radius:3px;background:rgba(0,0,0,.45);overflow:hidden}
+.pbar i{display:block;height:100%;background:linear-gradient(90deg,#e2b453,#f6d98e);transform-origin:0 50%;transform:scaleX(0)}
+.ptime{display:block;margin-top:5px;font-size:.8rem;color:#c9cfe2;font-variant-numeric:tabular-nums}
+.pna{display:none;flex:1;font-size:.88rem;color:#aab2cc}
+.is-off .ptrack,.is-off .eq{display:none}
+.is-off .pna{display:block}
+.is-off .pb{opacity:.4;cursor:default}
+
 /* Galeria (?galeria=1) */
-#s4{justify-content:flex-start}
 .gal{display:grid;grid-template-columns:1fr 1fr;gap:26px 12px;width:100%;max-width:360px;margin:0 auto;padding-bottom:24px}
 .gal .card{min-width:0}
 .gal .prize{margin-bottom:12px;overflow:visible}
@@ -196,7 +266,9 @@ h2{font-size:1.7rem;margin:0 0 6px;line-height:1.2}
 @keyframes fade{from{opacity:0}to{opacity:1}}
 
 @media (prefers-reduced-motion:reduce){
-  .sky::after,.moon::after,.float,.halo,.hint,#s3.on .prize::before{animation:none}
+  .sky::after,.moon::after,.float,.halo,.hint,#s3.on .prize::before,.is-playing .eq i{animation:none}
+  .start::before,.is-nudge .pb.main::before{display:none}
+  .is-playing .eq i{transform:scaleY(.6)}
   .screen,.screen.on{transform:none}
   #s3.on .prize,#s3.on .rv{animation:fade .6s ease-out both;animation-delay:0s}
 }
@@ -209,12 +281,37 @@ h2{font-size:1.7rem;margin:0 0 6px;line-height:1.2}
 <div id="flash" aria-hidden="true"></div>
 
 <main>
-  <!-- 1. Formulário -->
-  <section id="s1" class="screen on">
+  <!-- 0. Pré-página -->
+  <section id="s0" class="screen on">
     <div class="inner">
+      <picture class="logo"><source type="image/webp"><img width="193" height="119" alt="" decoding="async"></picture>
+      <button class="start" id="start" type="button" aria-label="Ouvir a mensagem e começar">
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 4.5v15a1 1 0 0 0 1.5.86l12-7.5a1 1 0 0 0 0-1.72l-12-7.5A1 1 0 0 0 7 4.5z" fill="currentColor"/></svg>
+      </button>
+      <p class="cap">🔊 Liga o som e toca aqui</p>
+    </div>
+  </section>
+
+  <!-- 1. Formulário -->
+  <section id="s1" class="screen">
+    <div class="inner">
+      <picture class="logo"><source type="image/webp"><img width="193" height="119" alt="" decoding="async"></picture>
       <p class="brand" data-bar></p>
       <h1 tabindex="-1">Tens um presente à tua espera</h1>
       <p class="sub">Deixa o teu nome e WhatsApp. Depois, abre a caixa.</p>
+      <div class="player" id="player">
+        <button class="pb main" id="pPlay" type="button" aria-label="Ouvir mensagem">
+          <svg class="i-play" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M8 5.5v13a1 1 0 0 0 1.5.86l10-6.5a1 1 0 0 0 0-1.72l-10-6.5A1 1 0 0 0 8 5.5z" fill="currentColor"/></svg>
+          <svg class="i-pause" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="6" y="5" width="4" height="14" rx="1" fill="currentColor"/><rect x="14" y="5" width="4" height="14" rx="1" fill="currentColor"/></svg>
+          <span class="spin" aria-hidden="true"></span>
+        </button>
+        <span class="eq" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+        <div class="ptrack" aria-hidden="true"><div class="pbar"><i id="pFill"></i></div><span class="ptime" id="pTime">0:00 / 0:00</span></div>
+        <span class="pna">Áudio indisponível</span>
+        <button class="pb rep" id="pRep" type="button" aria-label="Ouvir de novo">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 12a8 8 0 1 0 2.4-5.7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><path d="M4 3.5v4.5h4.5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
       <form id="form" novalidate>
         <div class="field">
           <label for="name">Nome</label>
@@ -273,7 +370,10 @@ h2{font-size:1.7rem;margin:0 0 6px;line-height:1.2}
 <script>
 /* ================= CONFIGURAÇÃO (editar aqui) ================= */
 var BAR_NAME = "Lunar Viewpoint Bar";
-var MAPS_URL = "https://maps.app.goo.gl/ayv2exDpN5ERwa2P7";
+var MAPS_URL = "https://maps.app.goo.gl/eN5VgCxrdHsNHE1Y8";
+// Áudio de boas-vindas. Vazio = player escondido; se falhar mostra "Áudio indisponível".
+var AUDIO_URL = "https://www.dropbox.com/scl/fi/uudzut2v6vldmu854xubb/Lunar-BV-A-v0.1.MP3?rlkey=elsxvdpxj7n0zwb95ijezguyz&st=i44gywms&raw=1";
+var LOGO_URL = "img/logo.png"; // ficheiro local; usa também img/logo.webp se existir
 
 /* weight = probabilidade relativa. Todos a 1 = mesma hipótese para todos.
    Ex.: um prémio com weight 2 sai o dobro das vezes de um com weight 1.
@@ -340,6 +440,93 @@ function makeImg(p, lazy) {
   for (var b = 0; b < bars.length; b++) bars[b].textContent = BAR_NAME;
   $("map").href = MAPS_URL;
 
+  // Logo: WebP com PNG de recurso; se falhar, esconde-se
+  var logos = document.querySelectorAll(".logo");
+  for (var l = 0; l < logos.length; l++) {
+    var lim = logos[l].querySelector("img"), lsrc = logos[l].querySelector("source");
+    lim.alt = BAR_NAME;
+    lim.onerror = (function (pic) { return function () { pic.classList.add("off"); }; })(logos[l]);
+    if (/\.png$/i.test(LOGO_URL)) lsrc.srcset = LOGO_URL.replace(/\.png$/i, ".webp");
+    else lsrc.parentNode.removeChild(lsrc);
+    lim.src = LOGO_URL;
+  }
+
+  /* ---------- Áudio de boas-vindas (um único objecto) ---------- */
+  var player = $("player"), pPlay = $("pPlay"), pFill = $("pFill"), pTime = $("pTime");
+  var audio = null, audioOff = false, raf = 0, fading = false;
+
+  function fmt(s) {
+    s = Math.max(0, Math.floor(s || 0));
+    return Math.floor(s / 60) + ":" + ("0" + (s % 60)).slice(-2);
+  }
+  function pState(st) { // "paused" | "loading" | "playing" | "nudge" | "off"
+    player.className = "player" + (st === "paused" ? "" : " is-" + st);
+    pPlay.setAttribute("aria-label", st === "playing" ? "Pausar" : "Ouvir mensagem");
+    if (st === "off") { audioOff = true; pPlay.disabled = $("pRep").disabled = true; }
+  }
+  function paint() {
+    var d = audio.duration, t = audio.currentTime;
+    var ok = isFinite(d) && d > 0;
+    pFill.style.transform = "scaleX(" + (ok ? Math.min(1, t / d) : 0) + ")";
+    pTime.textContent = fmt(t) + " / " + (ok ? fmt(d) : "0:00");
+  }
+  function loop() { paint(); raf = requestAnimationFrame(loop); }
+  // Chamado directamente dentro do toque (sem setTimeout/await antes), senão o som é bloqueado
+  function playAudio() {
+    if (!audio || audioOff) return;
+    fading = false;
+    audio.volume = 1;
+    if (audio.paused) pState("loading");
+    var pr = audio.play();
+    if (pr && pr.catch) pr.catch(function () { if (!audioOff && audio.paused) pState("nudge"); });
+  }
+
+  if (!AUDIO_URL) player.classList.add("hide");
+  else {
+    audio = new Audio();
+    audio.preload = "auto";
+    audio.src = AUDIO_URL;
+    audio.load();
+    audio.addEventListener("playing", function () { pState("playing"); cancelAnimationFrame(raf); loop(); });
+    audio.addEventListener("waiting", function () { if (!audio.paused) pState("loading"); });
+    audio.addEventListener("pause", function () { cancelAnimationFrame(raf); paint(); if (!audioOff) pState("paused"); });
+    audio.addEventListener("ended", function () { cancelAnimationFrame(raf); paint(); pState("paused"); });
+    audio.addEventListener("loadedmetadata", paint);
+    audio.addEventListener("error", function () { cancelAnimationFrame(raf); pState("off"); });
+    pPlay.addEventListener("click", function () {
+      if (audioOff) return;
+      if (audio.paused) playAudio(); else audio.pause();
+    });
+    $("pRep").addEventListener("click", function () {
+      if (audioOff) return;
+      audio.currentTime = 0;
+      paint();
+      playAudio();
+    });
+  }
+  // Volume até 0 em ~400 ms e pausa (no iPhone o volume é fixo: só pausa no fim)
+  function fadeOut() {
+    if (!audio || audio.paused || fading) return;
+    fading = true;
+    var v0 = audio.volume, t0 = Date.now();
+    (function step() {
+      if (!fading) return;
+      var k = Math.min(1, (Date.now() - t0) / 400);
+      try { audio.volume = v0 * (1 - k); } catch (e) {}
+      if (k < 1) requestAnimationFrame(step);
+      else { audio.pause(); fading = false; try { audio.volume = 1; } catch (e) {} }
+    })();
+  }
+
+  // Pré-página: toca o áudio e avança SEMPRE para o formulário
+  var started = false;
+  $("start").addEventListener("click", function () {
+    if (started) return;
+    started = true;
+    playAudio();
+    show("s1");
+  });
+
   function show(id) {
     var s = document.querySelectorAll(".screen");
     for (var i = 0; i < s.length; i++) s[i].classList.remove("on");
@@ -388,6 +575,7 @@ function makeImg(p, lazy) {
     if (!okPhone) { phoneIn.focus(); return; }
     if (document.activeElement) document.activeElement.blur();
 
+    fadeOut(); // a caixa abre em silêncio
     userName = n; // só em memória
     prize = pickPrize();
     preload(prize);
@@ -504,6 +692,8 @@ function makeImg(p, lazy) {
       gal.appendChild(card);
     }
     show("s4");
+  } else if (/[?&]skip=1(&|#|$)/.test(location.search)) {
+    show("s1"); // testes rápidos: sem pré-página e sem áudio automático
   }
 })();
 </script>

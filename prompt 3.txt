@@ -1,0 +1,74 @@
+Contexto: estamos a trabalhar no index.html da landing page do Lunar Viewpoint Bar (QR code → formulário nome + WhatsApp → caixa de presente → revelação do prémio). Aplica estas alterações POR CIMA da versão actual, sem desfazer o que já foi feito (bebidas, imagens em img/, modo galeria, etc.). Continuamos em fase de interface: nada é guardado.
+
+OBJECTIVO
+1) Criar uma pré-página com o logo, um botão de play e uma legenda.
+2) Ao tocar nesse botão: a página de captura aparece E o áudio de boas-vindas começa a tocar no mesmo instante.
+3) Na página de captura: o logo no topo e um player de áudio para a pessoa pausar ou ouvir de novo.
+4) Actualizar o link da localização.
+O áudio explica o que fazer, porque muitos clientes têm dificuldade de leitura.
+
+1. CONFIGURAÇÃO (actualizar o bloco de configuração no topo do script)
+- MAPS_URL = "https://maps.app.goo.gl/eN5VgCxrdHsNHE1Y8"
+- AUDIO_URL = "https://www.dropbox.com/scl/fi/uudzut2v6vldmu854xubb/Lunar-BV-A-v0.1.MP3?rlkey=elsxvdpxj7n0zwb95ijezguyz&st=i44gywms&raw=1"
+- LOGO_URL = "img/logo.png"   // ficheiro local, ver ponto 2
+- Se AUDIO_URL estiver vazio ou falhar, o player esconde-se ou mostra "Áudio indisponível", e o fluxo continua normal. Se o logo falhar, esconde-se sem partir o layout.
+
+2. LOGO
+- Descarrega https://i.imgur.com/Ta7JAef.png com curl -L. Confirma que é mesmo uma imagem e não uma página HTML.
+- Com sharp: corta as margens vazias (trim), redimensiona para 240px de altura máxima e grava em img/logo.png. Grava também img/logo.webp (qualidade 85); usa <picture> com o WebP e o PNG como fallback. Alvo: menos de 20 KB.
+- Verifica se tem fundo transparente e se as cores se lêem bem sobre o azul-escuro (#060b1f). Se o fundo não for transparente ou o contraste for fraco, NÃO alteres a imagem: avisa-me no fim.
+- <img> sempre com width e height definidos, alt = BAR_NAME e decoding="async".
+
+3. PRÉ-PÁGINA (novo ecrã 0, o primeiro a aparecer)
+- Mesmo fundo nocturno (estrelas e lua). Conteúdo centrado na vertical, sem formulário e sem mais texto:
+  a) logo, com cerca de 120px de altura máxima;
+  b) botão de play circular grande (~96px), dourado (mesmo gradiente do .btn), com ícone de play em SVG inline, um anel de pulso suave à volta (transform/opacity) e aria-label "Ouvir a mensagem e começar";
+  c) por baixo, a legenda: "🔊 Liga o som e toca aqui".
+- Ao tocar no botão, por esta ordem e no MESMO handler:
+  1. audio.play() chamado DIRECTAMENTE, sem setTimeout nem await antes. Senão o iPhone e alguns Android bloqueiam o som. Trata a promise do play() com .catch(), sem bloquear nada.
+  2. Transição para o ecrã 1 (formulário), com o fade que já existe.
+  3. O player do ecrã 1 já aparece no estado "a tocar" (ou "a carregar" se o áudio ainda estiver em buffer).
+- O botão avança SEMPRE para o formulário, mesmo que o áudio falhe ou demore. O áudio nunca bloqueia a captação do lead.
+- Protecção contra duplo toque no botão.
+
+4. CARREGAMENTO DO ÁUDIO
+- Um único objecto new Audio(AUDIO_URL), criado logo que a pré-página abre, com preload="auto" e audio.load(). Quem está na pré-página vai tocar no play, por isso o áudio deve estar pronto quando o fizer.
+- O mesmo objecto é usado no player do ecrã 1 (não criar outro).
+
+5. ECRÃ 1 — LOGO + PLAYER
+Ordem dos elementos de cima para baixo: logo (64px de altura máxima) → "LUNAR VIEWPOINT BAR" → título → "Deixa o teu nome e WhatsApp. Depois, abre a caixa." → PLAYER → campo Nome → campo WhatsApp → botão.
+Player (feito à medida, NÃO usar <audio controls> nativo):
+- "pílula" com a largura do formulário, fundo rgba branco ~7%, borda dourada subtil, cantos arredondados;
+- à esquerda, um botão circular dourado de play/pausa com pelo menos 48px, ícones SVG inline e spinner enquanto carrega (rotação via transform);
+- ao centro, a barra de progresso (fundo escuro, preenchimento dourado animado com transform: scaleX, nunca width) e o tempo "0:12 / 0:28" por baixo;
+- à direita, um botão "ouvir de novo" (ícone de repetir, pelo menos 48px de área de toque): volta a 0 e toca;
+- 4 barrinhas tipo equalizador ao lado do play, animadas SÓ enquanto o áudio toca (transform: scaleY).
+- No fim do áudio: o botão volta ao ícone de play.
+- Se a pessoa tiver tocado no play mas o áudio não tiver começado (play() rejeitado), o player fica em play com um pulso suave, para ela tocar de novo.
+- Em caso de erro (rede, link): o player mostra discretamente "Áudio indisponível" e fica desactivado.
+- Quando o formulário é enviado com sucesso: o volume desce até 0 em ~400ms e depois o áudio pausa. A caixa abre em silêncio.
+- Acessibilidade: aria-label nos botões ("Ouvir mensagem", "Pausar", "Ouvir de novo"), actualizados conforme o estado.
+
+6. ESPAÇO NO ECRÃ
+- O ecrã 1, com o logo e o player, tem de caber em 360×640 SEM scroll, com o botão "Receber o meu presente" visível. Se não couber: h1 a ~1.4rem, margens mais apertadas, inputs com 48px de altura (nunca menos).
+- Em 320×568 pode haver scroll, mas nada pode ficar cortado no topo. Usa margin:auto no conteúdo em vez de justify-content:center, para o topo nunca ficar inacessível.
+
+7. MODOS DE TESTE
+- ?galeria=1 continua a funcionar.
+- ?prize=<id> continua a forçar o prémio.
+- Novo: ?skip=1 salta a pré-página e vai directo ao formulário, sem áudio automático (para testes rápidos).
+
+8. TESTE DO LINK DO ÁUDIO
+Verifica com curl -I -L que AUDIO_URL acaba em Content-Type audio/mpeg (ou audio/*) e não em text/html. Diz-me o resultado, o tamanho do MP3 em KB e a duração. Se o MP3 passar de 300 KB, não o alteres: avisa-me, para eu converter para mono a 48 kbps e voltar a subir para o Dropbox.
+
+REGRAS QUE SE MANTÊM
+- CSS e JS inline, sem bibliotecas. Só animar transform e opacity.
+- prefers-reduced-motion: sem pulsos nem equalizador; tudo funciona.
+- O index.html tem de ficar abaixo de 40 KB (imagens e áudio não contam).
+- O botão "Ver localização" do ecrã de revelação passa a usar o novo MAPS_URL.
+
+QUANDO TERMINARES
+1. Abre o servidor local.
+2. Mostra-me capturas a 360×640 de: pré-página; ecrã 1 a tocar; ecrã 1 com "Áudio indisponível" (testa com um AUDIO_URL partido); e o ecrã 1 a 320×568.
+3. Diz-me: o tamanho do index.html, o peso do logo, o resultado do teste do áudio e em que linhas ficam MAPS_URL, AUDIO_URL e LOGO_URL.
+4. Testa a pré-página num telemóvel real se puderes. Se não, lembra-me de testar num Android e num iPhone, porque o comportamento do som no toque só se confirma em aparelho real.
