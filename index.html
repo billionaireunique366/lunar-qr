@@ -149,6 +149,10 @@ form .btn{margin-top:6px}
 .fx i{position:absolute;top:0;left:0;display:block;border-radius:50%}
 #flash{position:fixed;top:0;left:0;right:0;bottom:0;z-index:19;pointer-events:none;opacity:0}
 #flash.go{animation:flash .75s ease-out}
+#flash.big{animation-duration:1.1s}
+/* Lendário: a caixa fica roxo-dourada logo no tremor */
+.leg .halo{background:radial-gradient(circle,rgba(179,136,255,.7),rgba(255,217,112,.3) 45%,rgba(179,136,255,0) 68%)}
+.leg .beam{background:linear-gradient(to top,rgba(236,222,255,.95),rgba(179,136,255,.4) 55%,rgba(179,136,255,0))}
 @keyframes flash{0%{opacity:0}18%{opacity:1}100%{opacity:0}}
 
 /* Revelação */
@@ -165,6 +169,61 @@ form .btn{margin-top:6px}
 .prize img,.prize svg{position:relative;z-index:1;display:block;width:100%;height:100%;object-fit:contain;object-position:50% 100%}
 #s3.on .prize::before{animation:halo 2.6s ease-in-out 1s infinite alternate}
 @keyframes halo{from{opacity:.75;transform:scale(.94)}to{opacity:1;transform:scale(1.04)}}
+.r-raro .prize::before{background:radial-gradient(closest-side,rgba(159,212,255,.42),rgba(159,212,255,.12) 55%,rgba(159,212,255,0))}
+.r-lendario .prize::before{background:radial-gradient(closest-side,rgba(179,136,255,.5),rgba(255,217,112,.16) 55%,rgba(179,136,255,0))}
+[hidden]{display:none!important}
+
+/* Selo de raridade */
+.tier{display:inline-block;margin:0 0 8px;padding:4px 12px;border-radius:20px;font-size:.72rem;font-weight:800;letter-spacing:.2em;text-transform:uppercase}
+.t-comum{color:#1a1430;background:linear-gradient(90deg,#f6d98e,#eef2f8)}
+.t-raro{color:#06243f;background:linear-gradient(90deg,#9fd4ff,#e6f3ff)}
+.t-lendario{color:#fff;background:linear-gradient(90deg,#7c4dff,#b388ff 55%,#e0b64a);box-shadow:0 0 14px rgba(179,136,255,.6)}
+
+/* Animações dentro das artes SVG */
+.nt{animation:nt 2.6s ease-in-out infinite alternate}
+.nt2{animation-delay:-1.3s}
+@keyframes nt{from{transform:translateY(5px)}to{transform:translateY(-9px)}}
+.sh{animation:sh 3.4s ease-in-out infinite}
+@keyframes sh{0%,35%{transform:translateX(-120px)}100%{transform:translateX(460px)}}
+
+/* Carta da Happy Hour */
+.letter{
+  position:relative;margin:4px 6px 26px;padding:20px 20px 30px;text-align:left;
+  background:#f6efdc;color:#2a2238;border-radius:6px;box-shadow:0 14px 30px rgba(0,0,0,.45);
+  font-family:Georgia,"Times New Roman",serif;font-size:.98rem;line-height:1.45;
+  transform:rotate(-1.5deg);transform-origin:50% 0;
+}
+.letter p{margin:0 0 8px}
+.letter .lt-h{font-size:1.3rem;font-weight:700;text-align:center;margin-bottom:12px;color:#5a3d12}
+.letter .lt-n{font-weight:700}
+.letter .lt-s{margin:12px 0 0;font-style:italic}
+.seal{
+  position:absolute;right:18px;bottom:-18px;width:54px;height:54px;border-radius:50%;
+  background:radial-gradient(circle at 35% 30%,#f7dd94,#c99a3c 60%,#8f6823);box-shadow:0 3px 8px rgba(0,0,0,.35);
+}
+.seal::before{content:"";position:absolute;left:15px;top:13px;width:24px;height:24px;border-radius:50%;box-shadow:inset -7px 3px 0 0 #fff4cf}
+#s3.on .letter{animation:unfold .9s cubic-bezier(.2,1,.3,1) .6s both}
+@keyframes unfold{0%{transform:translateY(60px) rotate(-1.5deg) scaleY(.2);opacity:0}50%{opacity:1}100%{transform:rotate(-1.5deg) scaleY(1);opacity:1}}
+.hh{margin:0 0 14px;font-size:.95rem;color:#c9cfe2}
+.hh table{width:100%;border-collapse:collapse;text-align:left}
+.hh td{padding:6px 4px;border-bottom:1px solid rgba(232,194,106,.25)}
+.hh td+td{text-align:right;color:#f6d98e;font-weight:700}
+.cond{margin:-8px 0 18px;font-size:.88rem;color:#aab2cc;line-height:1.35}
+#s3 .btn+.btn{margin-top:10px}
+
+/* Bebida à escolha */
+#s3.on .menu{animation:up .5s ease-out .2s both}
+.menu.out{opacity:0;transition:opacity .3s ease}
+.mgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0 14px}
+.mc{
+  display:flex;flex-direction:column;align-items:center;justify-content:flex-end;min-width:0;min-height:48px;padding:8px 4px 6px;
+  font:inherit;font-size:.72rem;line-height:1.15;color:#eef0f7;cursor:pointer;
+  background:rgba(255,255,255,.06);border:2px solid transparent;border-radius:12px;transition:transform .2s ease,border-color .2s ease;
+}
+.mc img,.mc svg{display:block;width:100%;height:68px;object-fit:contain;margin-bottom:5px}
+.mc.sel{border-color:#e8c26a;background:rgba(232,194,106,.14);transform:scale(1.05)}
+.mc:focus-visible{outline:3px solid #fff;outline-offset:2px}
+#ok{animation:fade .3s ease-out}
 
 /* Logo */
 .logo{display:block;margin:0 auto}
@@ -238,12 +297,16 @@ form .btn{margin-top:6px}
 .is-off .pb{opacity:.4;cursor:default}
 
 /* Galeria (?galeria=1) */
-.gal{display:grid;grid-template-columns:1fr 1fr;gap:26px 12px;width:100%;max-width:360px;margin:0 auto;padding-bottom:24px}
+.gal{display:grid;grid-template-columns:1fr 1fr;grid-auto-flow:dense;gap:26px 12px;width:100%;max-width:360px;margin:0 auto;padding-bottom:24px}
 .gal .card{min-width:0}
 .gal .prize{margin-bottom:12px;overflow:visible}
 .gal .prize::before{width:170px;margin-left:-85px}
 .gal .pname{font-size:.72rem;letter-spacing:.12em;margin:0 0 3px}
 .gal .phr{margin:0;font-size:.82rem;color:#c9cfe2;line-height:1.3}
+.gal .card.wide{grid-column:span 2}
+.gal .tier{font-size:.6rem;padding:3px 9px;margin-bottom:5px}
+.gal .gcond{margin:4px 0 0;font-size:.74rem;color:#9aa3bf;line-height:1.3}
+.gh{margin:26px 0 14px;font-size:1.2rem;color:#f3e3b6}
 .pname{font-size:.95rem;font-weight:700;letter-spacing:.24em;text-transform:uppercase;color:#e8c26a;margin:0 0 14px}
 h2{font-size:1.7rem;margin:0 0 6px;line-height:1.2}
 .won{font-size:1.2rem;margin:0 0 6px;color:#fff}
@@ -254,13 +317,16 @@ h2{font-size:1.7rem;margin:0 0 6px;line-height:1.2}
 .code strong{display:block;font-size:2rem;letter-spacing:.12em;font-family:ui-monospace,"Courier New",monospace;color:#fff}
 #s3.on .prize{animation:rise .9s cubic-bezier(.2,1.2,.4,1) .1s both}
 #s3.on .rv{animation:up .5s ease-out both}
+#s3.on .tier{animation-delay:.45s}
 #s3.on .pname{animation-delay:.55s}
 #s3.on h2{animation-delay:.85s}
+#s3.on .hh{animation-delay:.95s}
 #s3.on .won{animation-delay:1.05s}
 #s3.on .show{animation-delay:1.2s}
 #s3.on .code{animation-delay:1.4s}
+#s3.on .cond{animation-delay:1.5s}
 #s3.on .btn{animation-delay:1.6s}
-#s3:not(.on) .prize,#s3:not(.on) .rv{opacity:0}
+#s3:not(.on) .prize,#s3:not(.on) .rv,#s3:not(.on) .letter{opacity:0}
 @keyframes rise{0%{transform:translateY(70px) scale(.3);opacity:0}70%{transform:translateY(-6px) scale(1.05);opacity:1}100%{transform:none;opacity:1}}
 @keyframes up{from{transform:translateY(14px);opacity:0}to{transform:none;opacity:1}}
 @keyframes fade{from{opacity:0}to{opacity:1}}
@@ -270,7 +336,10 @@ h2{font-size:1.7rem;margin:0 0 6px;line-height:1.2}
   .start::before,.is-nudge .pb.main::before{display:none}
   .is-playing .eq i{transform:scaleY(.6)}
   .screen,.screen.on{transform:none}
-  #s3.on .prize,#s3.on .rv{animation:fade .6s ease-out both;animation-delay:0s}
+  #s3.on .prize,#s3.on .rv,#s3.on .menu,#s3.on .letter{animation:fade .6s ease-out both;animation-delay:0s}
+  .nt,.sh{animation:none}
+  .letter,#s3.on .letter{transform:rotate(-1.5deg)}
+  .mc.sel{transform:none}
 }
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 </style>
@@ -347,13 +416,38 @@ h2{font-size:1.7rem;margin:0 0 6px;line-height:1.2}
   <!-- 3. Revelação -->
   <section id="s3" class="screen" aria-live="polite">
     <div class="inner">
-      <div class="prize" id="art" aria-hidden="true"></div>
-      <p class="pname rv" id="pname"></p>
-      <h2 class="rv" id="t3" tabindex="-1"></h2>
-      <p class="won rv" id="won"></p>
-      <p class="show rv">Mostra este ecrã ao balcão para levantar.</p>
-      <div class="code rv"><small>Código de resgate</small><strong id="code"></strong></div>
-      <a class="btn rv" id="map" target="_blank" rel="noopener">Ver localização</a>
+      <!-- Só no prémio "escolha": menu de 12 bebidas -->
+      <div class="menu" id="menu" hidden>
+        <p class="tier" id="mtier"></p>
+        <h2 id="mt" tabindex="-1">Bebida à tua escolha!</h2>
+        <p class="show">Escolhe uma:</p>
+        <div class="mgrid" id="mgrid"></div>
+        <button class="btn" id="ok" type="button" hidden>Quero esta</button>
+      </div>
+      <div id="res">
+        <div class="prize" id="art" aria-hidden="true"></div>
+        <p class="tier rv" id="tier"></p>
+        <p class="pname rv" id="pname"></p>
+        <!-- Só na Happy Hour: carta + preços -->
+        <div class="letter" id="letter" hidden>
+          <p class="lt-h">Convite Happy Hour</p>
+          <p class="lt-n" id="ltName"></p>
+          <p>estás convidado para a Happy Hour do Lunar.</p>
+          <p>Na Happy Hour, todas as bebidas saem ao preço mais baixo de Quissico. Mais barato que na barraca.</p>
+          <p>Mesma bebida. Mesmo gelo. Com vista do miradouro.</p>
+          <p id="ltHora" hidden></p>
+          <p class="lt-s">— Lunar Viewpoint Bar</p>
+          <span class="seal" aria-hidden="true"></span>
+        </div>
+        <div class="hh rv" id="hh" hidden></div>
+        <h2 class="rv" id="t3" tabindex="-1"></h2>
+        <p class="won rv" id="won"></p>
+        <p class="show rv" id="how"></p>
+        <div class="code rv"><small>Código de resgate</small><strong id="code"></strong></div>
+        <p class="cond rv" id="cond"></p>
+        <a class="btn rv" id="wa" target="_blank" rel="noopener" hidden>Marcar no WhatsApp</a>
+        <a class="btn rv" id="map" target="_blank" rel="noopener">Ver localização</a>
+      </div>
     </div>
   </section>
 
@@ -362,12 +456,16 @@ h2{font-size:1.7rem;margin:0 0 6px;line-height:1.2}
     <div class="inner">
       <p class="brand" data-bar></p>
       <h1 tabindex="-1">Galeria de prémios</h1>
+      <h2 class="gh">Presentes</h2>
+      <div class="gal" id="galT"></div>
+      <h2 class="gh">Bebidas</h2>
       <div class="gal" id="gal"></div>
     </div>
   </section>
 </main>
 
 <script>
+/* @sorteio-inicio (sem DOM; lido pelo teste em Node) */
 /* ================= CONFIGURAÇÃO (editar aqui) ================= */
 var BAR_NAME = "Lunar Viewpoint Bar";
 var MAPS_URL = "https://maps.app.goo.gl/eN5VgCxrdHsNHE1Y8";
@@ -375,34 +473,98 @@ var MAPS_URL = "https://maps.app.goo.gl/eN5VgCxrdHsNHE1Y8";
 var AUDIO_URL = "https://www.dropbox.com/scl/fi/uudzut2v6vldmu854xubb/Lunar-BV-A-v0.1.MP3?rlkey=elsxvdpxj7n0zwb95ijezguyz&st=i44gywms&raw=1";
 var LOGO_URL = "img/logo.png"; // ficheiro local; usa também img/logo.webp se existir
 
-/* weight = probabilidade relativa. Todos a 1 = mesma hipótese para todos.
-   Ex.: um prémio com weight 2 sai o dobro das vezes de um com weight 1.
-   type prepara a próxima fase (desconto, ticket, vip, enigma); por agora tudo "bebida".
-   Teste: ?prize=<id> força o prémio; ?galeria=1 mostra todos. */
-var PRIZES = [
-  { id: "2m-grande", name: "2M Grande", phrase: "uma 2M Grande", type: "bebida", img: "img/2m-grande.webp", weight: 1 },
-  { id: "2m-lata", name: "2M Lata", phrase: "uma 2M Lata", type: "bebida", img: "img/2m-lata.webp", weight: 1 },
-  { id: "2m-txoti", name: "2M Txoti", phrase: "uma 2M Txoti", type: "bebida", img: "img/2m-txoti.webp", weight: 1 },
-  { id: "brutal-fruit-garrafa", name: "Brutal Fruit", phrase: "uma Brutal Fruit", type: "bebida", img: "img/brutal-fruit-garrafa.webp", weight: 1 },
-  { id: "brutal-fruit-lata", name: "Brutal Fruit Lata", phrase: "uma Brutal Fruit Lata", type: "bebida", img: "img/brutal-fruit-lata.webp", weight: 1 },
-  { id: "castle-lite", name: "Castle Lite", phrase: "uma Castle Lite", type: "bebida", img: "img/castle-lite.webp", weight: 1 },
-  { id: "corona-extra", name: "Corona Extra", phrase: "uma Corona Extra", type: "bebida", img: "img/corona-extra.webp", weight: 1 },
-  { id: "heineken-lata", name: "Heineken Lata", phrase: "uma Heineken Lata", type: "bebida", img: "img/heineken-lata.webp", weight: 1 },
-  { id: "heineken-txoti", name: "Heineken Txoti", phrase: "uma Heineken Txoti", type: "bebida", img: "img/heineken-txoti.webp", weight: 1 },
-  { id: "impala-milho-lata", name: "Impala Milho Lata", phrase: "uma Impala Milho Lata", type: "bebida", img: "img/impala-milho-lata.webp", weight: 1 },
-  { id: "impala-mandioca-grande", name: "Impala Mandioca Grande", phrase: "uma Impala Mandioca Grande", type: "bebida", img: "img/impala-mandioca-grande.webp", weight: 1 },
-  { id: "impala-milho-grande", name: "Impala Milho Grande", phrase: "uma Impala Milho Grande", type: "bebida", img: "img/impala-milho-grande.webp", weight: 1 },
-  { id: "impala-milho-txoti", name: "Impala Milho Txoti", phrase: "uma Impala Milho Txoti", type: "bebida", img: "img/impala-milho-txoti.webp", weight: 1 },
-  { id: "jc-le-roux-la-fleurette", name: "J.C. Le Roux La Fleurette", phrase: "um J.C. Le Roux La Fleurette", type: "bebida", img: "img/jc-le-roux-la-fleurette.webp", weight: 1 },
-  { id: "jc-le-roux-le-domaine", name: "J.C. Le Roux Le Domaine", phrase: "um J.C. Le Roux Le Domaine", type: "bebida", img: "img/jc-le-roux-le-domaine.webp", weight: 1 },
-  { id: "jc-le-roux-sauvignon-light", name: "J.C. Le Roux Sauvignon Blanc Light", phrase: "um J.C. Le Roux Sauvignon Blanc Light", type: "bebida", img: "img/jc-le-roux-sauvignon-light.webp", weight: 1 },
-  { id: "laurentina-preta", name: "Laurentina Preta", phrase: "uma Laurentina Preta", type: "bebida", img: "img/laurentina-preta.webp", weight: 1 },
-  { id: "txilar-lata", name: "Txilar Lata", phrase: "uma Txilar Lata", type: "bebida", img: "img/txilar-lata.webp", weight: 1 }
+var VALIDADE_DIAS = 7;          // {data} = hoje + VALIDADE_DIAS, em dd/mm
+var CONSUMO_MINIMO = "300 MZN"; // entra em {CONSUMO_MINIMO}
+// Número = mensagem com código e nome; um link (wa.link/...) usa a mensagem fixa do link; vazio = "Mostra ao balcão".
+var WHATSAPP_BAR = "258848376705";
+var HAPPY_HOUR = { horario: "", precos: [] }; // precos: [{ bebida: "2M Lata", preco: "60 MZN" }]
+
+// As 12 bebidas do prémio "Bebida à Escolha" (ids de DRINKS)
+var CHOICE_MENU = ["2m-lata", "2m-txoti", "brutal-fruit-garrafa", "brutal-fruit-lata", "castle-lite", "corona-extra",
+  "heineken-lata", "heineken-txoti", "impala-milho-lata", "impala-milho-txoti", "laurentina-preta", "txilar-lata"];
+
+// Raridade: partículas e cores da explosão
+var TIERS = {
+  comum:    { label: "Comum",    particles: 36, colors: ["#ffd970", "#eef2f8", "#e8b84a", "#c3ccda", "#f6d98e", "#ffffff"] },
+  raro:     { label: "Raro",     particles: 44, colors: ["#9fd4ff", "#e6f3ff", "#ffffff"] },
+  lendario: { label: "Lendário", particles: 60, colors: ["#b388ff", "#7c4dff", "#ffd970", "#fff1c1"] }
+};
+
+/* Tipos de presente (nível 1 do sorteio). Os pesos somam 100, por isso cada peso é a percentagem.
+   redeem: "hoje" | "proxima" | "reserva" | "evento". Na condição, {data} e {CONSUMO_MINIMO} são substituídos.
+   art: "bebida" (imagem da bebida sorteada), "carta" (Happy Hour), "menu" (escolha) ou o desenho SVG com esse id.
+   Teste: ?prize=<id> força o tipo; ?prize=bebida&drink=<id> força a bebida; ?galeria=1 mostra tudo. */
+var PRIZE_TYPES = [
+  { id: "bebida",         tier: "comum",    weight: 30, name: "Bebida sorteada",       phrase: "",                                     condition: "Levanta hoje ao balcão.", redeem: "hoje", art: "bebida" },
+  { id: "happy-hour",     tier: "comum",    weight: 15, name: "Happy Hour",            phrase: "um convite para a Happy Hour",         condition: "Válido até {data}.", redeem: "proxima", art: "carta" },
+  { id: "dedicatoria",    tier: "comum",    weight: 10, name: "Dedicatória Musical",   phrase: "uma dedicatória musical",              condition: "Diz ao balcão a música e para quem é.", redeem: "hoje", art: "dedicatoria" },
+  { id: "estacionamento", tier: "comum",    weight: 8,  name: "Estacionamento Grátis", phrase: "estacionamento grátis",                condition: "Na tua próxima visita. Válido até {data}.", redeem: "proxima", art: "estacionamento" },
+  { id: "escolha",        tier: "raro",     weight: 8,  name: "Bebida à Escolha",      phrase: "uma bebida à tua escolha",             condition: "Levanta hoje ao balcão.", redeem: "hoje", art: "menu" },
+  { id: "2por1",          tier: "raro",     weight: 7,  name: "2 por 1",               phrase: "um 2 por 1: traz um amigo",            condition: "Só vale com um amigo. Compras uma, a segunda é oferta. Válido até {data}.", redeem: "proxima", art: "2por1" },
+  { id: "petisco",        tier: "raro",     weight: 6,  name: "Petisco Grátis",        phrase: "um petisco grátis",                    condition: "Com consumo mínimo de {CONSUMO_MINIMO}.", redeem: "hoje", art: "petisco" },
+  { id: "mesa",           tier: "raro",     weight: 5,  name: "Mesa no Miradouro",     phrase: "uma mesa reservada no miradouro",      condition: "Consumo mínimo de {CONSUMO_MINIMO}. Válido até {data}.", redeem: "reserva", art: "mesa" },
+  { id: "enigma",         tier: "raro",     weight: 4,  name: "Prémio Enigma",         phrase: "um prémio enigma",                     condition: "Vem ao balcão descobrir o teu prémio.", redeem: "hoje", art: "enigma" },
+  { id: "ticket",         tier: "raro",     weight: 4,  name: "Ticket VIP Show",       phrase: "um ticket para o show do Clayton da DRENA", condition: "Data do show a anunciar. Guarda este ecrã.", redeem: "evento", art: "ticket" },
+  { id: "balde",          tier: "lendario", weight: 2,  name: "Balde de Cerveja",      phrase: "um balde de cerveja",                  condition: "Para partilhar com o teu grupo. Levanta ao balcão.", redeem: "hoje", art: "balde" },
+  { id: "vip",            tier: "lendario", weight: 1,  name: "Cartão VIP",            phrase: "o Cartão VIP do Lunar",                condition: "Fala com o balcão para activar o teu cartão.", redeem: "hoje", art: "vip" }
+];
+
+/* Bebidas (nível 2). weight = probabilidade relativa. Imagem: img/<id>.webp (ou img: "..."). */
+var DRINKS = [
+  { id: "2m-grande", name: "2M Grande", phrase: "uma 2M Grande", weight: 1 },
+  { id: "2m-lata", name: "2M Lata", phrase: "uma 2M Lata", weight: 1 },
+  { id: "2m-txoti", name: "2M Txoti", phrase: "uma 2M Txoti", weight: 1 },
+  { id: "brutal-fruit-garrafa", name: "Brutal Fruit", phrase: "uma Brutal Fruit", weight: 1 },
+  { id: "brutal-fruit-lata", name: "Brutal Fruit Lata", phrase: "uma Brutal Fruit Lata", weight: 1 },
+  { id: "castle-lite", name: "Castle Lite", phrase: "uma Castle Lite", weight: 1 },
+  { id: "corona-extra", name: "Corona Extra", phrase: "uma Corona Extra", weight: 1 },
+  { id: "heineken-lata", name: "Heineken Lata", phrase: "uma Heineken Lata", weight: 1 },
+  { id: "heineken-txoti", name: "Heineken Txoti", phrase: "uma Heineken Txoti", weight: 1 },
+  { id: "impala-milho-lata", name: "Impala Milho Lata", phrase: "uma Impala Milho Lata", weight: 1 },
+  { id: "impala-mandioca-grande", name: "Impala Mandioca Grande", phrase: "uma Impala Mandioca Grande", weight: 1 },
+  { id: "impala-milho-grande", name: "Impala Milho Grande", phrase: "uma Impala Milho Grande", weight: 1 },
+  { id: "impala-milho-txoti", name: "Impala Milho Txoti", phrase: "uma Impala Milho Txoti", weight: 1 },
+  { id: "jc-le-roux-la-fleurette", name: "J.C. Le Roux La Fleurette", phrase: "um J.C. Le Roux La Fleurette", weight: 1 },
+  { id: "jc-le-roux-le-domaine", name: "J.C. Le Roux Le Domaine", phrase: "um J.C. Le Roux Le Domaine", weight: 1 },
+  { id: "jc-le-roux-sauvignon-light", name: "J.C. Le Roux Sauvignon Blanc Light", phrase: "um J.C. Le Roux Sauvignon Blanc Light", weight: 1 },
+  { id: "laurentina-preta", name: "Laurentina Preta", phrase: "uma Laurentina Preta", weight: 1 },
+  { id: "txilar-lata", name: "Txilar Lata", phrase: "uma Txilar Lata", weight: 1 }
 ];
 /* ============================================================== */
 
-/* ---------- Imagem do prémio ---------- */
+for (var di = 0; di < DRINKS.length; di++) DRINKS[di].img = DRINKS[di].img || "img/" + DRINKS[di].id + ".webp";
+
+function pickWeighted(list, rng) {
+  var total = 0, i, r;
+  for (i = 0; i < list.length; i++) total += list[i].weight;
+  r = rng() * total;
+  for (i = 0; i < list.length; i++) { r -= list[i].weight; if (r < 0) return list[i]; }
+  return list[list.length - 1];
+}
+function byId(list, id) {
+  for (var i = 0; i < list.length; i++) if (list[i].id === id) return list[i];
+  return null;
+}
+// want/drinkId vêm de ?prize= e ?drink= (?prize=<id de bebida> também serve)
+function drawPrize(rng, want, drinkId) {
+  var type = want ? byId(PRIZE_TYPES, want) : null, drink = null;
+  if (!type && want && (drink = byId(DRINKS, want))) type = byId(PRIZE_TYPES, "bebida");
+  if (!type) type = pickWeighted(PRIZE_TYPES, rng);
+  if (type.id === "bebida" && !drink) drink = (drinkId && byId(DRINKS, drinkId)) || pickWeighted(DRINKS, rng);
+  return { type: type, drink: drink };
+}
+/* @sorteio-fim */
+
+/* ---------- Imagens e artes ---------- */
 var IMG_W = 210, IMG_H = 360; // caixa de referência (o CSS fixa a altura do contentor)
+
+// {data} = hoje + VALIDADE_DIAS (dd/mm)
+var DATA = (function () {
+  var d = new Date();
+  d.setDate(d.getDate() + VALIDADE_DIAS);
+  return ("0" + d.getDate()).slice(-2) + "/" + ("0" + (d.getMonth() + 1)).slice(-2);
+})();
+function fill(s) { return s.replace(/\{data\}/g, DATA).replace(/\{CONSUMO_MINIMO\}/g, CONSUMO_MINIMO); }
 
 // Garrafa genérica, sem marca, para quando a imagem não carrega
 function fallbackSVG(name) {
@@ -416,7 +578,7 @@ function fallbackSVG(name) {
     '<defs><linearGradient id="fg" x1="0" x2="1"><stop offset="0" stop-color="#6b5a2e"/><stop offset=".35" stop-color="#d9b25a"/><stop offset="1" stop-color="#5a4a24"/></linearGradient></defs>' +
     '<path d="M68 10h24v8h-2v58c0 14 30 26 30 52v118c0 8-6 12-14 12H54c-8 0-14-4-14-12V128c0-26 30-38 30-52V18h-2z" fill="url(#fg)" stroke="#f6e3a8" stroke-opacity=".6" stroke-width="2"/>' +
     '<rect x="50" y="138" width="7" height="104" rx="3.5" fill="#fff" opacity=".4"/>' +
-    '<text x="80" y="292" text-anchor="middle" font-family="system-ui,Arial,sans-serif" font-size="14" font-weight="700" fill="#f6d98e">' + label + '</text>' +
+    '<text x="80" y="290" text-anchor="middle" font-family="system-ui,Arial,sans-serif" font-size="14" font-weight="700" fill="#f6d98e">' + label + '</text>' +
     '</svg>';
 }
 
@@ -429,6 +591,133 @@ function makeImg(p, lazy) {
   if (lazy) im.setAttribute("loading", "lazy");
   return im;
 }
+
+/* Desenhos dos presentes (SVG, sem marcas) */
+var F = ' font-family="Arial,sans-serif" font-weight="900"';
+function svg(w, h, body) {
+  return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + w + ' ' + h + '" preserveAspectRatio="xMidYMax meet" aria-hidden="true" focusable="false">' +
+    '<defs><linearGradient id="aG" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#b8862f"/><stop offset=".45" stop-color="#f7dd94"/><stop offset="1" stop-color="#a8792a"/></linearGradient>' +
+    '<linearGradient id="aS" x1="0" x2="1"><stop offset="0" stop-color="#7d8592"/><stop offset=".35" stop-color="#f4f6f8"/><stop offset="1" stop-color="#6b7280"/></linearGradient></defs>' +
+    body + '</svg>';
+}
+// Garrafa genérica: x, y, largura, altura, cor
+function bot(x, y, w, h, c) {
+  var n = w * .36, s = (w - n) / 2;
+  return '<path d="M' + (x + s) + ' ' + y + 'h' + n + 'v' + h * .3 + 'l' + s + ' ' + h * .14 + 'v' + h * .56 + 'h' + -w +
+    'v' + -h * .56 + 'l' + s + ' ' + -h * .14 + 'z" fill="' + c + '"/><rect x="' + (x + s - 1) + '" y="' + (y - 4) + '" width="' + (n + 2) + '" height="6" rx="2" fill="#c3ccda"/>';
+}
+function note(cls, x, y) {
+  return '<g class="' + cls + '" fill="#f6d98e"><ellipse cx="' + x + '" cy="' + y + '" rx="9" ry="7" transform="rotate(-20 ' + x + ' ' + y + ')"/>' +
+    '<rect x="' + (x + 6) + '" y="' + (y - 36) + '" width="3.5" height="36"/><path d="M' + (x + 6) + ' ' + (y - 36) + 'q15 4 14 20q-3-9-14-10z"/></g>';
+}
+function glass(t) {
+  return '<g transform="' + t + '"><path d="M28 70h50l-7 112H35z" fill="#f2b632"/>' +
+    '<path d="M24 66c4-10 16-12 22-6 6-8 20-8 26 0 8-4 14 2 12 10H24z" fill="#fff8e6"/>' +
+    '<path d="M28 70h50l-7 112H35z" fill="none" stroke="#eef2f8" stroke-opacity=".7" stroke-width="2.5"/>' +
+    '<rect x="38" y="92" width="6" height="72" rx="3" fill="#fff" opacity=".35"/></g>';
+}
+function skewer(r, y) {
+  var c = ["#8a4b25", "#c0392b", "#8a4b25", "#e8c26a", "#8a4b25"], s = '<g transform="rotate(' + r + ' 100 140)"><rect x="14" y="' + (y + 10) + '" width="172" height="4" rx="2" fill="#c99a3c"/>';
+  for (var i = 0; i < 5; i++) s += '<rect x="' + (38 + i * 26) + '" y="' + y + '" width="22" height="24" rx="6" fill="' + c[i] + '"/>';
+  return s + '</g>';
+}
+
+var ART = {
+  dedicatoria: function () {
+    return svg(200, 200,
+      '<radialGradient id="aV"><stop offset=".35" stop-color="#2b3150"/><stop offset="1" stop-color="#0a0c16"/></radialGradient>' +
+      '<circle cx="86" cy="116" r="80" fill="url(#aV)" stroke="#c3ccda" stroke-opacity=".4" stroke-width="2"/>' +
+      '<g fill="none" stroke="#fff" stroke-opacity=".09"><circle cx="86" cy="116" r="66"/><circle cx="86" cy="116" r="54"/><circle cx="86" cy="116" r="42"/></g>' +
+      '<path d="M30 84a64 64 0 0 1 34-34" fill="none" stroke="#fff" stroke-opacity=".3" stroke-width="5" stroke-linecap="round"/>' +
+      '<circle cx="86" cy="116" r="26" fill="url(#aG)"/><circle cx="86" cy="116" r="4" fill="#0a0c16"/>' +
+      note("nt", 152, 74) + note("nt nt2", 178, 44));
+  },
+  estacionamento: function () {
+    return svg(200, 200,
+      '<rect x="60" y="98" width="9" height="98" fill="#9aa4b5"/>' +
+      '<rect x="20" y="10" width="90" height="90" rx="14" fill="#1f5fd1" stroke="#eef2f8" stroke-width="5"/>' +
+      '<text x="65" y="85" text-anchor="middle"' + F + ' font-size="74" fill="#fff">P</text>' +
+      '<path d="M88 182v-16c0-6 4-9 9-10l14-22c3-4 6-6 12-6h34c6 0 9 2 12 6l12 22c6 1 9 4 9 10v16z" fill="url(#aG)"/>' +
+      '<path d="M116 138h18v18h-28zM140 138h16c3 0 5 1 6 3l8 15h-30z" fill="#0f1a45" opacity=".8"/>' +
+      '<circle cx="110" cy="182" r="12" fill="#0a0c16" stroke="#c3ccda" stroke-width="4"/><circle cx="168" cy="182" r="12" fill="#0a0c16" stroke="#c3ccda" stroke-width="4"/>');
+  },
+  "2por1": function () {
+    return svg(200, 200,
+      glass("rotate(12 53 190)") + glass("translate(200 0) scale(-1 1) rotate(12 53 190)") +
+      '<path d="M100 40V22M86 46l-9-13M114 46l9-13" stroke="#f6d98e" stroke-width="3.5" stroke-linecap="round"/>' +
+      '<circle cx="164" cy="34" r="28" fill="url(#aG)" stroke="#fff1c1" stroke-width="2.5" stroke-dasharray="4 3"/>' +
+      '<text x="164" y="42" text-anchor="middle"' + F + ' font-size="21" fill="#2a2238">2×1</text>');
+  },
+  petisco: function () {
+    return svg(200, 200,
+      '<ellipse cx="100" cy="168" rx="94" ry="28" fill="#9aa4b5"/><ellipse cx="100" cy="163" rx="94" ry="28" fill="#eef2f8"/>' +
+      '<ellipse cx="100" cy="163" rx="70" ry="18" fill="#d9dfe8"/>' + skewer(-10, 118) + skewer(8, 134));
+  },
+  mesa: function () {
+    return svg(200, 200,
+      '<circle cx="138" cy="58" r="64" fill="#fff4cf" opacity=".12"/><circle cx="138" cy="58" r="44" fill="#fff4cf"/>' +
+      '<circle cx="124" cy="46" r="7" fill="#e3d6a8"/><circle cx="152" cy="72" r="10" fill="#e3d6a8"/>' +
+      '<rect y="193" width="200" height="4" rx="2" fill="#c3ccda" opacity=".5"/>' +
+      '<path d="M22 98v95M22 150h34v43M178 98v95M178 150h-34v43" fill="none" stroke="#c3ccda" stroke-width="7" stroke-linecap="round"/>' +
+      '<rect x="96" y="134" width="8" height="58" fill="#c99a3c"/><rect x="78" y="189" width="44" height="5" rx="2" fill="#c99a3c"/>' +
+      '<ellipse cx="100" cy="132" rx="52" ry="10" fill="url(#aG)"/>' +
+      '<rect x="97" y="110" width="6" height="16" fill="#fff1c1"/><path d="M100 98c5 5 4 10 0 10s-5-5 0-10z" fill="#ffd970"/>');
+  },
+  enigma: function () {
+    return svg(200, 200,
+      '<rect x="34" y="44" width="132" height="122" fill="#e9d9ae"/>' +
+      '<rect x="22" y="30" width="156" height="22" rx="11" fill="#cdb57e"/><rect x="22" y="160" width="156" height="22" rx="11" fill="#cdb57e"/>' +
+      '<path d="M48 148c20-6 26-30 46-34s34 4 42-28" fill="none" stroke="#8a6a3a" stroke-width="3" stroke-dasharray="6 6"/>' +
+      '<path d="M132 64l16 16M148 64l-16 16" stroke="#c0392b" stroke-width="5" stroke-linecap="round"/>' +
+      '<text x="84" y="142" text-anchor="middle" font-family="Georgia,serif" font-weight="700" font-size="100" fill="url(#aG)" stroke="#6b4e1f" stroke-width="2">?</text>');
+  },
+  ticket: function () {
+    return svg(320, 150,
+      '<path d="M8 8h304v47a20 20 0 0 0 0 40v47H8V95a20 20 0 0 0 0-40z" fill="#16235a" stroke="url(#aG)" stroke-width="3"/>' +
+      '<path d="M244 16v118" stroke="#e8c26a" stroke-width="2" stroke-dasharray="4 5"/>' +
+      '<text x="128" y="66" text-anchor="middle"' + F + ' font-size="26" fill="url(#aG)" textLength="200" lengthAdjust="spacingAndGlyphs">CLAYTON DA DRENA</text>' +
+      '<text x="128" y="94" text-anchor="middle" font-family="Arial,sans-serif" font-weight="700" font-size="14" letter-spacing="3" fill="#eef2f8">AO VIVO NO LUNAR</text>' +
+      '<text x="128" y="122" text-anchor="middle" font-family="Arial,sans-serif" font-size="11" letter-spacing="2" fill="#9fb0d8">DATA A ANUNCIAR</text>' +
+      '<text x="268" y="66" text-anchor="middle"' + F + ' font-size="22" fill="url(#aG)">VIP</text>' +
+      '<text x="268" y="86" text-anchor="middle" font-family="Arial,sans-serif" font-size="9" letter-spacing="1" fill="#c9cfe2">ENTRADA</text>' +
+      '<path d="M268 98l4 8 9 1-7 6 2 9-8-5-8 5 2-9-7-6 9-1z" fill="#e8c26a"/>');
+  },
+  balde: function () {
+    var c = ["#2f7d3a", "#a8641c", "#cfe3d0", "#5a3414", "#3d8f47"], y = [24, 10, 16, 6, 26], s = "";
+    for (var i = 0; i < 5; i++) s += bot(44 + i * 24, y[i], 22, 100, c[i]);
+    return svg(200, 200, s +
+      '<g fill="#dff3ff" opacity=".92"><rect x="40" y="80" width="22" height="18" rx="4" transform="rotate(-14 51 89)"/>' +
+      '<rect x="88" y="78" width="20" height="18" rx="4" transform="rotate(10 98 87)"/><rect x="134" y="80" width="22" height="18" rx="4" transform="rotate(18 145 89)"/></g>' +
+      '<path d="M20 114c-14 0-14 26 4 26M180 114c14 0 14 26-4 26" fill="none" stroke="#c3ccda" stroke-width="5"/>' +
+      '<path d="M26 98h148l-16 94H42z" fill="url(#aS)"/><rect x="20" y="92" width="160" height="14" rx="7" fill="#eef2f8"/>' +
+      '<path d="M36 142h128M40 170h120" stroke="#6b7280" stroke-width="3" opacity=".5"/>' +
+      '<path d="M52 114l7 66" stroke="#fff" stroke-width="6" opacity=".4" stroke-linecap="round"/>');
+  },
+  vip: function () {
+    return svg(320, 200,
+      '<clipPath id="vC"><rect x="6" y="6" width="308" height="188" rx="18"/></clipPath>' +
+      '<linearGradient id="vS" x1="0" x2="1"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".5" stop-color="#fff" stop-opacity=".6"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>' +
+      '<rect x="6" y="6" width="308" height="188" rx="18" fill="url(#aG)" stroke="#fff1c1" stroke-width="2"/>' +
+      '<rect x="16" y="16" width="288" height="168" rx="12" fill="none" stroke="#7a5620" stroke-opacity=".45"/>' +
+      '<circle cx="262" cy="58" r="26" fill="#fff8e0"/><circle cx="274" cy="50" r="24" fill="#e2b453"/>' +
+      '<text x="30" y="92" font-family="Georgia,serif" font-weight="700" font-size="56" letter-spacing="6" fill="#2a2238">VIP</text>' +
+      '<text x="30" y="122" font-family="Arial,sans-serif" font-weight="700" font-size="12" letter-spacing="3" fill="#3a2c16">LUNAR VIEWPOINT BAR</text>' +
+      '<text class="vn" x="30" y="166" font-family="Arial,sans-serif" font-weight="700" font-size="18" fill="#2a2238"></text>' +
+      '<rect x="250" y="132" width="40" height="30" rx="5" fill="#e9d9ae" stroke="#7a5620" stroke-opacity=".5"/>' +
+      '<g clip-path="url(#vC)"><g transform="rotate(20 160 100)"><rect class="sh" x="-60" y="-60" width="60" height="320" fill="url(#vS)"/></g></g>');
+  },
+  // Só na galeria
+  carta: function () {
+    return svg(200, 200,
+      '<g transform="rotate(-4 100 120)"><rect x="22" y="62" width="156" height="112" rx="6" fill="#f6efdc"/>' +
+      '<path d="M22 66l78 58 78-58" fill="none" stroke="#c9b894" stroke-width="3"/>' +
+      '<circle cx="100" cy="124" r="20" fill="url(#aG)"/><circle cx="100" cy="124" r="10" fill="none" stroke="#fff4cf" stroke-width="5" stroke-dasharray="20 60"/></g>');
+  },
+  menu: function () {
+    return svg(200, 200, bot(22, 40, 44, 156, "#2f7d3a") + bot(78, 14, 44, 182, "#a8641c") + bot(134, 40, 44, 156, "#cfe3d0") +
+      '<text x="100" y="140" text-anchor="middle"' + F + ' font-size="48" fill="url(#aG)" stroke="#2a2238" stroke-width="2">?</text>');
+  }
+};
 
 /* ---------- Lógica ---------- */
 (function () {
@@ -471,7 +760,7 @@ function makeImg(p, lazy) {
     pTime.textContent = fmt(t) + " / " + (ok ? fmt(d) : "0:00");
   }
   function loop() { paint(); raf = requestAnimationFrame(loop); }
-  // Chamado directamente dentro do toque (sem setTimeout/await antes), senão o som é bloqueado
+  // Chamar directamente no toque (sem setTimeout/await), senão o som é bloqueado
   function playAudio() {
     if (!audio || audioOff) return;
     fading = false;
@@ -532,23 +821,18 @@ function makeImg(p, lazy) {
     for (var i = 0; i < s.length; i++) s[i].classList.remove("on");
     var el = $(id);
     el.classList.add("on");
-    setTimeout(function () {
-      var f = el.querySelector("[tabindex='-1']");
-      if (f) f.focus();
-    }, 400);
+    setTimeout(focusIn, 400, el);
+  }
+  // Foca o primeiro título visível do ecrã
+  function focusIn(el) {
+    var f = el.querySelectorAll("[tabindex='-1']");
+    for (var i = 0; i < f.length; i++) if (f[i].offsetParent) return f[i].focus();
   }
 
-  function pickPrize() {
-    var m = /[?&]prize=([^&#]*)/i.exec(location.search);
-    if (m) {
-      var want = decodeURIComponent(m[1]).toLowerCase();
-      for (var i = 0; i < PRIZES.length; i++) if (PRIZES[i].id === want) return PRIZES[i];
-    }
-    var total = 0, j;
-    for (j = 0; j < PRIZES.length; j++) total += PRIZES[j].weight;
-    var r = Math.random() * total;
-    for (j = 0; j < PRIZES.length; j++) { r -= PRIZES[j].weight; if (r < 0) return PRIZES[j]; }
-    return PRIZES[PRIZES.length - 1];
+  // Parâmetros de teste no URL
+  function qp(k) {
+    var m = new RegExp("[?&]" + k + "=([^&#]*)", "i").exec(location.search);
+    return m ? decodeURIComponent(m[1]).toLowerCase() : "";
   }
 
   function normPhone(v) {
@@ -577,66 +861,181 @@ function makeImg(p, lazy) {
 
     fadeOut(); // a caixa abre em silêncio
     userName = n; // só em memória
-    prize = pickPrize();
-    preload(prize);
-    $("pname").textContent = prize.name;
-    $("t3").textContent = "Parabéns, " + userName + "!";
-    $("won").innerHTML = "Ganhaste <b></b>.";
-    $("won").querySelector("b").textContent = prize.phrase;
-    $("code").textContent = "LUA-" + ("000" + Math.floor(Math.random() * 10000)).slice(-4);
+    prize = drawPrize(Math.random, qp("prize"), qp("drink"));
+    fillReveal();
+    prepare();
     show("s2");
   });
 
-  // Pré-carrega só a imagem sorteada; enquanto isso a pessoa está no ecrã da caixa
-  var artReady = false, onArt = null;
+  /* ---------- Revelação conforme o tipo de presente ---------- */
+  var HOW = {
+    hoje: "Mostra este ecrã ao balcão para levantar.",
+    proxima: "Guarda este ecrã e mostra ao balcão na tua próxima visita.",
+    reserva: WHATSAPP_BAR ? "Marca a tua mesa pelo WhatsApp." : "Mostra este ecrã ao balcão.",
+    evento: "Guarda este ecrã. Vamos avisar-te da data pelo WhatsApp."
+  };
+  function setWon(pre, phrase) {
+    $("won").innerHTML = pre + "<b></b>.";
+    $("won").querySelector("b").textContent = phrase;
+  }
+  function tierEl(el, t) {
+    el.textContent = TIERS[t.tier].label;
+    el.className = el.className.replace(/ ?t-\w+/g, "") + " t-" + t.tier;
+  }
+  function fillReveal() {
+    var t = prize.type, d = prize.drink, hh = t.art === "carta", code;
+    code = "LUA-" + ("000" + Math.floor(Math.random() * 10000)).slice(-4);
+    $("s3").classList.add("r-" + t.tier);
+    tierEl($("tier"), t);
+    $("pname").textContent = d ? d.name : t.name;
+    $("t3").textContent = "Parabéns, " + userName + "!";
+    setWon("Ganhaste ", d ? d.phrase : t.phrase);
+    $("how").textContent = HOW[t.redeem];
+    $("code").textContent = code;
+    $("cond").textContent = fill(t.condition);
+    $("art").hidden = $("t3").hidden = $("won").hidden = hh;
+    $("letter").hidden = $("hh").hidden = !hh;
+    if (hh) fillLetter();
+    if (t.redeem === "reserva" && WHATSAPP_BAR) {
+      $("wa").href = /^\d+$/.test(WHATSAPP_BAR)
+        ? "https://wa.me/" + WHATSAPP_BAR + "?text=" + encodeURIComponent("Olá! Ganhei uma mesa no miradouro. Código: " + code + ". Nome: " + userName)
+        : (/^https?:/.test(WHATSAPP_BAR) ? "" : "https://") + WHATSAPP_BAR;
+      $("wa").hidden = false;
+    }
+    $("res").hidden = t.art === "menu";
+    $("menu").hidden = t.art !== "menu";
+    if (t.art === "menu") tierEl($("mtier"), t);
+  }
+  function fillLetter() {
+    $("ltName").textContent = userName + ",";
+    if (HAPPY_HOUR.horario) { $("ltHora").textContent = "Horário: " + HAPPY_HOUR.horario; $("ltHora").hidden = false; }
+    var box = $("hh"), p = HAPPY_HOUR.precos;
+    if (!p.length) { box.textContent = "Menu de preços em breve"; return; }
+    var tb = document.createElement("table");
+    for (var i = 0; i < p.length; i++) {
+      var tr = tb.insertRow();
+      tr.insertCell().textContent = p[i].bebida;
+      tr.insertCell().textContent = p[i].preco;
+    }
+    box.appendChild(tb);
+  }
+
+  // O nome do cliente entra sempre com textContent
+  function svgArt(box, t, who) {
+    box.innerHTML = ART[t.art]();
+    var vn = box.querySelector(".vn");
+    if (vn) {
+      vn.textContent = who;
+      vn.setAttribute("font-size", Math.max(10, Math.min(18, 340 / Math.max(who.length, 1))));
+    }
+  }
   function setArt(p, im) {
     var art = $("art");
     art.innerHTML = "";
     if (im) art.appendChild(im); else art.innerHTML = fallbackSVG(p.name);
   }
-  function preload(p) {
+  function loadImg(p, cb) {
     var im = makeImg(p), settled = false;
-    function finish(ok) {
-      if (settled) return;
-      settled = true;
-      setArt(p, ok ? im : null);
-      artReady = true;
-      if (onArt) { var f = onArt; onArt = null; f(); }
-    }
+    function finish(ok) { if (!settled) { settled = true; cb(ok ? im : null); } }
     im.onload = function () {
       if (im.decode) im.decode().then(function () { finish(true); }, function () { finish(true); });
       else finish(true);
     };
     im.onerror = function () { finish(false); };
     im.src = p.img;
+    return im;
   }
-  // Corre fn quando a imagem estiver pronta, ou ao fim de maxMs (com a garrafa genérica)
+
+  // Pré-carrega só o que o prémio sorteado precisa
+  var artReady = false, onArt = null;
+  function ready() {
+    artReady = true;
+    if (onArt) { var f = onArt; onArt = null; f(); }
+  }
+  function prepare() {
+    var t = prize.type;
+    if (t.art === "bebida") loadImg(prize.drink, function (im) { setArt(prize.drink, im); ready(); });
+    else if (t.art === "menu") buildMenu();
+    else { if (t.art !== "carta") svgArt($("art"), t, userName); ready(); }
+  }
+  // fn quando a arte estiver pronta, ou ao fim de maxMs
   function whenArt(fn, maxMs) {
     if (artReady) return fn();
     var t = setTimeout(function () {
       onArt = null;
-      if (!$("art").firstChild) setArt(prize, null); // a imagem real substitui-a se chegar depois
+      if (prize.type.art === "bebida" && !$("art").firstChild) setArt(prize.drink, null); // a imagem real substitui-a se chegar depois
       fn();
     }, maxMs);
     onArt = function () { clearTimeout(t); fn(); };
   }
 
-  function burst(x, y) {
+  /* ---------- Bebida à escolha: menu de 12 ---------- */
+  var chosen = null, confirmed = false;
+  function buildMenu() {
+    var grid = $("mgrid"), left = CHOICE_MENU.length;
+    function one() { if (--left === 0) ready(); }
+    for (var i = 0; i < CHOICE_MENU.length; i++) {
+      var d = byId(DRINKS, CHOICE_MENU[i]);
+      if (!d) { one(); continue; }
+      var b = document.createElement("button"), nm = document.createElement("span");
+      b.type = "button";
+      b.className = "mc";
+      b.setAttribute("aria-pressed", "false");
+      var im = loadImg(d, (function (cell) {
+        return function (ok) { if (!ok) cell.firstChild.outerHTML = fallbackSVG(""); one(); };
+      })(b));
+      im.alt = "";
+      b.appendChild(im);
+      nm.textContent = d.name;
+      b.appendChild(nm);
+      b.onclick = (function (drink, cell) { return function () { pick(drink, cell); }; })(d, b);
+      grid.appendChild(b);
+    }
+  }
+  function pick(d, cell) {
+    if (confirmed) return;
+    var cells = $("mgrid").children;
+    for (var i = 0; i < cells.length; i++) { cells[i].classList.remove("sel"); cells[i].setAttribute("aria-pressed", "false"); }
+    cell.classList.add("sel");
+    cell.setAttribute("aria-pressed", "true");
+    chosen = d;
+    $("ok").hidden = false;
+    if ($("ok").scrollIntoView) $("ok").scrollIntoView({ block: "nearest", behavior: reduced ? "auto" : "smooth" });
+  }
+  $("ok").addEventListener("click", function () {
+    if (confirmed || !chosen) return;
+    confirmed = true;
+    var cells = $("mgrid").children;
+    for (var i = 0; i < cells.length; i++) cells[i].disabled = true;
+    this.disabled = true;
+    $("menu").classList.add("out");
+    setTimeout(function () {
+      $("menu").hidden = true;
+      var im = makeImg(chosen);
+      im.onerror = function () { setArt(chosen, null); };
+      im.src = chosen.img;
+      setArt(chosen, im);
+      $("pname").textContent = chosen.name;
+      setWon("Escolheste ", chosen.phrase);
+      $("res").hidden = false; // as animações de revelação recomeçam aqui
+      focusIn($("s3"));
+    }, 320);
+  });
+
+  function burst(x, y, tier) {
     if (!document.body.animate) return;
-    var layer = document.createElement("div"), left = 36;
+    var n = tier.particles, c = tier.colors, layer = document.createElement("div"), left = n;
     layer.className = "fx";
     layer.style.transform = "translate(" + x + "px," + y + "px)";
-    var golds = ["#ffd970", "#e8b84a", "#f6d98e"], silvers = ["#eef2f8", "#c3ccda", "#ffffff"];
     function done() { if (--left === 0 && layer.parentNode) layer.parentNode.removeChild(layer); }
-    for (var i = 0; i < 36; i++) {
+    for (var i = 0; i < n; i++) {
       var p = document.createElement("i"), s = 4 + Math.random() * 6;
-      var pal = i % 2 ? silvers : golds;
       p.style.width = p.style.height = s + "px";
       p.style.marginLeft = p.style.marginTop = -s / 2 + "px";
-      p.style.background = pal[i % 3];
+      p.style.background = c[i % c.length];
       if (i % 3 === 0) p.style.borderRadius = "1px";
       layer.appendChild(p);
-      var a = (i / 36) * Math.PI * 2 + Math.random() * 0.3;
+      var a = (i / n) * Math.PI * 2 + Math.random() * 0.3;
       var d = 90 + Math.random() * 130;
       var dx = Math.cos(a) * d, dy = Math.sin(a) * d - 30;
       var anim = p.animate([
@@ -655,6 +1054,8 @@ function makeImg(p, lazy) {
     if (opened) return;
     opened = true;
     gift.setAttribute("aria-disabled", "true");
+    var leg = prize.type.tier === "lendario";
+    if (leg) stage.classList.add("leg"); // sente-se especial antes de ver o prémio
     if (reduced) { whenArt(function () { show("s3"); }, 1500); return; }
 
     stage.classList.add("shake");
@@ -665,34 +1066,51 @@ function makeImg(p, lazy) {
       var r = $("box").getBoundingClientRect();
       var x = r.left + r.width / 2, y = r.top + r.height / 3;
       var fl = $("flash");
-      fl.style.background = "radial-gradient(circle at " + x + "px " + y + "px,rgba(255,246,214,.9),rgba(255,246,214,0) 60%)";
-      fl.classList.add("go");
-      burst(x, y);
+      fl.style.background = "radial-gradient(circle at " + x + "px " + y + "px," + (leg
+        ? "rgba(240,230,255,1),rgba(179,136,255,.6) 35%,rgba(179,136,255,0) 85%)"
+        : "rgba(255,246,214,.9),rgba(255,246,214,0) 60%)");
+      fl.className = leg ? "go big" : "go";
+      burst(x, y, TIERS[prize.type.tier]);
       stage.classList.add("gone");
       show("s3");
     }
   });
 
-  // Modo galeria (?galeria=1): só para rever o visual das 18 bebidas
-  if (/[?&]galeria=1(&|#|$)/.test(location.search)) {
-    var gal = $("gal");
-    for (var g = 0; g < PRIZES.length; g++) {
-      var p = PRIZES[g], card = document.createElement("div"), box = document.createElement("div");
-      card.className = "card";
-      box.className = "prize";
-      var im = makeImg(p, true);
-      im.onerror = (function (bx, pr) { return function () { bx.innerHTML = fallbackSVG(pr.name); }; })(box, p);
-      im.src = p.img;
-      box.appendChild(im);
-      card.appendChild(box);
-      var nm = document.createElement("p"), ph = document.createElement("p");
-      nm.className = "pname"; nm.textContent = p.name;
-      ph.className = "phr"; ph.textContent = "Ganhaste " + p.phrase + ".";
-      card.appendChild(nm); card.appendChild(ph);
-      gal.appendChild(card);
+  // Galeria (?galeria=1)
+  function card(parent, title, phrase, cond, t, fillArt) {
+    var c = document.createElement("div"), box = document.createElement("div");
+    c.className = "card" + (t && (t.art === "ticket" || t.art === "vip") ? " wide" : "");
+    box.className = "prize";
+    fillArt(box);
+    c.appendChild(box);
+    if (t) { var tg = document.createElement("p"); tg.className = "tier"; tierEl(tg, t); c.appendChild(tg); }
+    var lines = [["pname", title], ["phr", phrase], ["gcond", cond]];
+    for (var i = 0; i < lines.length; i++) {
+      if (!lines[i][1]) continue;
+      var el = document.createElement("p");
+      el.className = lines[i][0];
+      el.textContent = lines[i][1];
+      c.appendChild(el);
     }
+    parent.appendChild(c);
+  }
+  function imgArt(d) {
+    return function (box) {
+      var im = makeImg(d, true);
+      im.onerror = function () { box.innerHTML = fallbackSVG(d.name); };
+      im.src = d.img;
+      box.appendChild(im);
+    };
+  }
+  if (qp("galeria") === "1") {
+    for (var g = 0; g < PRIZE_TYPES.length; g++) {
+      var t = PRIZE_TYPES[g], bebida = t.art === "bebida";
+      card($("galT"), t.name, "Ganhaste " + (bebida ? "uma das " + DRINKS.length + " bebidas" : t.phrase) + ".", fill(t.condition), t,
+        bebida ? imgArt(DRINKS[1]) : (function (tt) { return function (box) { svgArt(box, tt, "O TEU NOME"); }; })(t));
+    }
+    for (g = 0; g < DRINKS.length; g++) card($("gal"), DRINKS[g].name, "Ganhaste " + DRINKS[g].phrase + ".", "", null, imgArt(DRINKS[g]));
     show("s4");
-  } else if (/[?&]skip=1(&|#|$)/.test(location.search)) {
+  } else if (qp("skip") === "1") {
     show("s1"); // testes rápidos: sem pré-página e sem áudio automático
   }
 })();

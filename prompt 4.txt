@@ -1,0 +1,108 @@
+Contexto: estamos a trabalhar no index.html da landing page do Lunar Viewpoint Bar (pré-página com play → formulário com áudio → caixa de presente → revelação). Aplica estas alterações POR CIMA da versão actual, sem desfazer nada (bebidas em img/, áudio, logo, galeria, ?skip, ?prize). Continuamos em fase de interface: nada é guardado.
+
+OBJECTIVO
+A caixa passa a sortear 12 TIPOS de presente, com 3 níveis de raridade. Até agora só havia bebidas; as 18 bebidas passam a ser UM dos tipos ("Bebida sorteada").
+
+1. SORTEIO EM DOIS NÍVEIS
+- Nível 1: sorteio ponderado do TIPO de presente (lista PRIZE_TYPES).
+- Nível 2: se sair "bebida", sorteio ponderado entre as 18 bebidas (o array de bebidas que já existe, renomeado para DRINKS).
+- O sorteio acontece no submit do formulário, como agora, e o asset do prémio sorteado é pré-carregado durante o ecrã da caixa.
+
+2. BLOCO DE CONFIGURAÇÃO (no topo do script, fácil de editar)
+- VALIDADE_DIAS = 7
+- CONSUMO_MINIMO = "300 MZN"
+- WHATSAPP_BAR = ""   // ex.: "25884xxxxxxx"; se vazio, os prémios de reserva usam "Mostra ao balcão"
+- HAPPY_HOUR = { horario: "", precos: [] }   // precos: [{ bebida: "2M Lata", preco: "60 MZN" }]
+- CHOICE_MENU = ["2m-lata","2m-txoti","brutal-fruit-garrafa","brutal-fruit-lata","castle-lite","corona-extra","heineken-lata","heineken-txoti","impala-milho-lata","impala-milho-txoti","laurentina-preta","txilar-lata"]
+- TIERS = {
+    comum:    { label: "Comum",    particles: 36, colors: dourado e prata (os actuais) },
+    raro:     { label: "Raro",     particles: 44, colors: prata e azul-claro (#9fd4ff, #e6f3ff, #ffffff) },
+    lendario: { label: "Lendário", particles: 60, colors: roxo e dourado (#b388ff, #7c4dff, #ffd970, #fff1c1) }
+  }
+- PRIZE_TYPES (cada um com: id, tier, weight, name, phrase, condition, redeem, art)
+  redeem: "hoje" | "proxima" | "reserva" | "evento". {data} = hoje + VALIDADE_DIAS, no formato dd/mm.
+
+  id: "bebida"        | comum    | 30 | name: (nome da bebida)  | phrase: "uma {bebida}" (usa a phrase da bebida) | condition: "Levanta hoje ao balcão." | redeem: hoje
+  id: "happy-hour"    | comum    | 15 | name: "Happy Hour"       | phrase: "um convite para a Happy Hour" | condition: "Válido até {data}." | redeem: proxima
+  id: "dedicatoria"   | comum    | 10 | name: "Dedicatória Musical" | phrase: "uma dedicatória musical" | condition: "Diz ao balcão a música e para quem é." | redeem: hoje
+  id: "estacionamento"| comum    | 8  | name: "Estacionamento Grátis" | phrase: "estacionamento grátis" | condition: "Na tua próxima visita. Válido até {data}." | redeem: proxima
+  id: "escolha"       | raro     | 8  | name: "Bebida à Escolha" | phrase: "uma bebida à tua escolha" | condition: "Levanta hoje ao balcão." | redeem: hoje
+  id: "2por1"         | raro     | 7  | name: "2 por 1"          | phrase: "um 2 por 1: traz um amigo" | condition: "Só vale com um amigo. Compras uma, a segunda é oferta. Válido até {data}." | redeem: proxima
+  id: "petisco"       | raro     | 6  | name: "Petisco Grátis"   | phrase: "um petisco grátis" | condition: "Com consumo mínimo de {CONSUMO_MINIMO}." | redeem: hoje
+  id: "mesa"          | raro     | 5  | name: "Mesa no Miradouro" | phrase: "uma mesa reservada no miradouro" | condition: "Consumo mínimo de {CONSUMO_MINIMO}. Válido até {data}." | redeem: reserva
+  id: "enigma"        | raro     | 4  | name: "Prémio Enigma"    | phrase: "um prémio enigma" | condition: "Vem ao balcão descobrir o teu prémio." | redeem: hoje
+  id: "ticket"        | raro     | 4  | name: "Ticket VIP Show"  | phrase: "um ticket para o show do Clayton da DRENA" | condition: "Data do show a anunciar. Guarda este ecrã." | redeem: evento
+  id: "balde"         | lendario | 2  | name: "Balde de Cerveja" | phrase: "um balde de cerveja" | condition: "Para partilhar com o teu grupo. Levanta ao balcão." | redeem: hoje
+  id: "vip"           | lendario | 1  | name: "Cartão VIP"       | phrase: "o Cartão VIP do Lunar" | condition: "Fala com o balcão para activar o teu cartão." | redeem: hoje
+- Comentário no código: os pesos somam 100, por isso cada peso é a percentagem.
+
+3. ARTE DOS PRESENTES QUE NÃO SÃO BEBIDAS
+Desenha em SVG inline, sem logótipos de marcas, no estilo da página (azul-noite, dourado, prata). Mesma caixa de revelação das bebidas (mesma altura, halo, sombra elíptica):
+- dedicatoria: disco de vinil com notas musicais a flutuar;
+- estacionamento: placa "P" azul com um carro simples em silhueta;
+- 2por1: dois copos a brindar, com um selo "2×1";
+- petisco: prato com espetadas simples;
+- mesa: mesa com duas cadeiras sob uma lua grande;
+- enigma: mapa enrolado (pergaminho) com um "?" dourado grande e um X tracejado;
+- ticket: bilhete horizontal com picote lateral, headline "CLAYTON DA DRENA" em letras grandes, subtítulo "AO VIVO NO LUNAR" e "DATA A ANUNCIAR". Neste prémio o SVG pode ser mais largo do que alto;
+- balde: balde metálico com gelo e 4–5 gargalos de garrafas genéricas (sem marcas);
+- vip: cartão dourado horizontal com brilho diagonal, lua, "VIP" e "LUNAR VIEWPOINT BAR". O nome do cliente aparece no cartão (texto inserido com textContent ou como nó <text> do SVG, nunca innerHTML com o nome).
+O brilho diagonal do cartão VIP anima só com transform.
+
+4. HAPPY HOUR: ECRÃ EM FORMA DE CARTA
+Quando sai happy-hour, a revelação mostra uma carta em vez de uma imagem:
+- papel creme (#f6efdc) com sombra suave, ligeiramente inclinado (-1.5deg), selo de cera dourado com uma lua no fundo, texto escuro (#2a2238);
+- sobe da caixa e "desdobra" (scaleY de 0.2 para 1, com transform-origin no topo);
+- texto da carta (o {nome} entra com textContent):
+    "Convite Happy Hour"
+    "{nome},"
+    "estás convidado para a Happy Hour do Lunar."
+    "Na Happy Hour, todas as bebidas saem ao preço mais baixo de Quissico. Mais barato que na barraca."
+    "Mesma bebida. Mesmo gelo. Com vista do miradouro."
+    Se HAPPY_HOUR.horario existir: "Horário: {horario}"
+    "— Lunar Viewpoint Bar"
+- por baixo da carta: se HAPPY_HOUR.precos tiver itens, uma tabela simples bebida | preço; se estiver vazio, "Menu de preços em breve".
+- depois: condição, código e botões, como nos outros prémios.
+- A carta tem de caber em 360×640 com scroll suave do ecrã se for preciso. Nada pode ficar cortado no topo.
+
+5. BEBIDA À ESCOLHA: MENU DE 12
+Quando sai "escolha":
+- a revelação mostra primeiro o título "Bebida à tua escolha!" e "Escolhe uma:" e uma grelha de 3 colunas com as 12 bebidas de CHOICE_MENU (imagem + nome curto por baixo). Cada célula é um <button> com pelo menos 48px de área de toque;
+- as 12 imagens são pré-carregadas durante o ecrã da caixa, só quando sai este prémio;
+- ao tocar numa bebida, ela fica destacada (borda dourada, ligeiro scale) e aparece o botão "Quero esta";
+- ao confirmar, a grelha sai com fade e a bebida escolhida sobe como numa revelação normal, com "Parabéns, {nome}!", "Escolheste uma {bebida}.", a condição, o código e os botões;
+- depois de confirmar, não dá para mudar.
+
+6. RAREZA VISÍVEL NA EXPLOSÃO E NA REVELAÇÃO
+- A explosão usa as cores e o número de partículas do tier sorteado.
+- No lendário: o flash é mais forte e ligeiramente roxo, e o halo da caixa muda para roxo-dourado logo no tremor. Assim a pessoa sente que é especial ANTES de ver o prémio.
+- Na revelação, por cima do nome do prémio, aparece um pequeno selo com o tier ("COMUM", "RARO", "LENDÁRIO") nas cores do tier.
+- prefers-reduced-motion: sem explosão. A cor do selo continua a indicar a raridade.
+
+7. TEXTO E BOTÕES DA REVELAÇÃO CONFORME O TIPO DE LEVANTAMENTO
+- Linha 2: "Ganhaste " + phrase + "." (para a escolha: "Escolheste uma {bebida}.").
+- Linha 3 conforme redeem:
+    hoje: "Mostra este ecrã ao balcão para levantar."
+    proxima: "Guarda este ecrã e mostra ao balcão na tua próxima visita."
+    reserva: "Marca a tua mesa pelo WhatsApp." (ou "Mostra este ecrã ao balcão." se WHATSAPP_BAR estiver vazio)
+    evento: "Guarda este ecrã. Vamos avisar-te da data pelo WhatsApp."
+- Condição: uma linha pequena por baixo do código, com {data} e {CONSUMO_MINIMO} substituídos.
+- Botões: "Ver localização" mantém-se. Para "reserva" com WHATSAPP_BAR preenchido, junta antes um botão "Marcar no WhatsApp" que abre https://wa.me/{WHATSAPP_BAR}?text=... com a mensagem codificada: "Olá! Ganhei uma mesa no miradouro. Código: LUA-XXXX. Nome: {nome}".
+- O texto do código mantém-se no formato LUA-####.
+
+8. MODOS DE TESTE
+- ?prize=<id do tipo> força o tipo (ex.: ?prize=vip, ?prize=happy-hour, ?prize=escolha).
+- ?prize=bebida&drink=<id> força uma bebida específica. Mantém a compatibilidade: ?prize=<id de uma bebida> continua a funcionar como antes.
+- ?galeria=1 passa a ter duas secções: "Presentes" (os 12 tipos, com arte, selo de tier, phrase e condição já com a data calculada) e "Bebidas" (as 18 que já existem).
+
+9. REGRAS QUE SE MANTÊM
+- CSS e JS inline, sem bibliotecas. Só animar transform e opacity. Partículas removidas do DOM no fim.
+- Protecção contra duplo toque (caixa, células do menu, botão "Quero esta").
+- O index.html tem de ficar abaixo de 60 KB (sobe de 40 para 60 KB por causa dos 10 SVGs novos). Se passar, avisa-me antes de cortar detalhe nas artes.
+- Nomes de clientes inseridos sempre com textContent.
+
+QUANDO TERMINARES
+1. Abre o servidor local.
+2. Mostra-me capturas a 360×640 de: galeria (secção Presentes); revelação vip; revelação happy-hour (carta); o menu da escolha com uma bebida seleccionada; revelação ticket.
+3. Corre 10 000 sorteios num script de teste (Node, a importar a mesma função de sorteio) e mostra-me a percentagem real de cada tipo, para confirmar que bate com os pesos.
+4. Diz-me o tamanho do index.html e em que linhas ficam PRIZE_TYPES, CHOICE_MENU, HAPPY_HOUR e TIERS.
