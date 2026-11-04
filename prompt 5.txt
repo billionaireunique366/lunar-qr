@@ -1,0 +1,37 @@
+Contexto: no index.html da landing page do Lunar Viewpoint Bar, o áudio de boas-vindas NÃO toca no telemóvel (o player mostra indisponível ou não arranca). Vamos passar a usar o áudio a partir do Dropbox. Aplica as alterações por cima da versão actual, sem desfazer nada.
+
+1. DIAGNÓSTICO PRIMEIRO (antes de mudar)
+Diz-me qual é a causa provável da falha actual. Verifica:
+- que valor tem AUDIO_URL agora (caminho local? file://? link do Dropbox com dl=0?);
+- se o objecto Audio tem crossOrigin definido, ou se o áudio passa pela Web Audio API (AudioContext / createMediaElementSource). O Dropbox não garante cabeçalhos CORS, e qualquer uma das duas coisas pode deixar o áudio mudo no telemóvel;
+- se o audio.play() é chamado directamente dentro do handler do toque, sem await, setTimeout ou fetch antes;
+- se o caminho tem diferenças de maiúsculas/minúsculas (.MP3 vs .mp3). O servidor de hospedagem diferencia, o Windows não.
+
+2. NOVO LINK DO ÁUDIO
+No bloco de configuração:
+AUDIO_URL = "https://dl.dropboxusercontent.com/scl/fi/uudzut2v6vldmu854xubb/Lunar-BV-A-v0.1.MP3?rlkey=elsxvdpxj7n0zwb95ijezguyz&st=5etbhngl&raw=1"
+AUDIO_URL_FALLBACK = "https://www.dropbox.com/scl/fi/uudzut2v6vldmu854xubb/Lunar-BV-A-v0.1.MP3?rlkey=elsxvdpxj7n0zwb95ijezguyz&st=5etbhngl&raw=1"
+- Se o primeiro der erro (evento "error" no Audio), tenta automaticamente o FALLBACK uma vez, no mesmo objecto Audio (trocar o src e voltar a chamar play()). Só depois de os dois falharem é que o player mostra "Áudio indisponível".
+
+3. REGRAS PARA O ÁUDIO FUNCIONAR NO TELEMÓVEL
+- NÃO definir crossOrigin no Audio.
+- NÃO usar Web Audio API / AudioContext. O equalizador do player continua a ser só animação CSS enquanto o áudio toca, sem análise real do som.
+- audio.play() chamado directamente no handler do toque do botão da pré-página, de forma síncrona, com .catch() na promise.
+- Se o play() for rejeitado (NotAllowedError), o player fica em pausa com pulso para a pessoa tocar outra vez. O formulário aparece sempre.
+- preload="auto" na pré-página, como já está.
+
+4. MODO DIAGNÓSTICO NO ECRÃ (?debug=1)
+No telemóvel não há consola, por isso preciso de ver o erro no próprio ecrã. Com ?debug=1 no URL, mostra uma caixinha fixa no fundo do ecrã (texto pequeno, fundo preto semi-transparente) com:
+- o src em uso (curto: "directo" ou "fallback");
+- os eventos do áudio à medida que acontecem: loadstart, loadedmetadata, canplay, playing, waiting, stalled, error;
+- em caso de error: audio.error.code e audio.error.message;
+- em caso de play() rejeitado: o nome e a mensagem do erro;
+- o audio.readyState e o audio.networkState actuais.
+Sem ?debug=1, nada disto aparece nem pesa.
+
+5. TESTE
+- Testa com curl -I -L os dois links e diz-me o Content-Type e o status final de cada um (o esperado é 200 com audio/mpeg).
+- Abre o servidor local e confirma no Chromium que o áudio toca a partir do Dropbox.
+
+QUANDO TERMINARES
+Diz-me: a causa provável da falha anterior, o resultado do curl dos dois links, e em que linhas ficam AUDIO_URL e AUDIO_URL_FALLBACK.

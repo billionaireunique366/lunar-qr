@@ -469,8 +469,10 @@ h2{font-size:1.7rem;margin:0 0 6px;line-height:1.2}
 /* ================= CONFIGURAÇÃO (editar aqui) ================= */
 var BAR_NAME = "Lunar Viewpoint Bar";
 var MAPS_URL = "https://maps.app.goo.gl/eN5VgCxrdHsNHE1Y8";
-// Áudio de boas-vindas. Vazio = player escondido; se falhar mostra "Áudio indisponível".
-var AUDIO_URL = "https://www.dropbox.com/scl/fi/uudzut2v6vldmu854xubb/Lunar-BV-A-v0.1.MP3?rlkey=elsxvdpxj7n0zwb95ijezguyz&st=i44gywms&raw=1";
+// Áudio de boas-vindas. Vazio = player escondido. Se o directo der erro tenta o FALLBACK
+// uma vez; só depois dos dois falharem mostra "Áudio indisponível". ?debug=1 mostra os eventos.
+var AUDIO_URL = "https://dl.dropboxusercontent.com/scl/fi/uudzut2v6vldmu854xubb/Lunar-BV-A-v0.1.MP3?rlkey=elsxvdpxj7n0zwb95ijezguyz&st=5etbhngl&raw=1";
+var AUDIO_URL_FALLBACK = "https://www.dropbox.com/scl/fi/uudzut2v6vldmu854xubb/Lunar-BV-A-v0.1.MP3?rlkey=elsxvdpxj7n0zwb95ijezguyz&st=5etbhngl&raw=1";
 var LOGO_URL = "img/logo.png"; // ficheiro local; usa também img/logo.webp se existir
 
 var VALIDADE_DIAS = 7;          // {data} = hoje + VALIDADE_DIAS, em dd/mm
@@ -767,13 +769,42 @@ var ART = {
     audio.volume = 1;
     if (audio.paused) pState("loading");
     var pr = audio.play();
-    if (pr && pr.catch) pr.catch(function () { if (!audioOff && audio.paused) pState("nudge"); });
+    if (pr && pr.catch) pr.catch(function (e) {
+      if (dbg) dbg("play() rejeitado: " + (e && e.name) + " — " + (e && e.message));
+      if (!audioOff && audio.paused) pState("nudge");
+    });
+  }
+
+  /* ---------- ?debug=1: caixinha com os eventos do áudio (no telemóvel não há consola) ---------- */
+  var dbg = null;
+  if (/[?&]debug=1(&|#|$)/.test(location.search)) {
+    var dbox = document.createElement("div");
+    dbox.style.cssText = "position:fixed;left:6px;right:6px;bottom:6px;z-index:9999;max-height:38vh;overflow:auto;" +
+      "background:rgba(0,0,0,.78);color:#cfe;font:11px/1.35 ui-monospace,Menlo,Consolas,monospace;" +
+      "padding:6px 8px;border-radius:6px;white-space:pre-wrap;word-break:break-all";
+    document.body.appendChild(dbox);
+    var t00 = Date.now();
+    dbg = function (msg) {
+      var st = audio ? "  [readyState=" + audio.readyState + " networkState=" + audio.networkState + "]" : "";
+      var line = document.createElement("div");
+      line.textContent = ((Date.now() - t00) / 1000).toFixed(1) + "s " + msg + st;
+      dbox.appendChild(line);
+      dbox.scrollTop = dbox.scrollHeight;
+    };
   }
 
   if (!AUDIO_URL) player.classList.add("hide");
   else {
+    // Sem crossOrigin e sem Web Audio API: o Dropbox não garante CORS e o som ficaria mudo
     audio = new Audio();
     audio.preload = "auto";
+    var usingFallback = false;
+    if (dbg) {
+      ["loadstart", "loadedmetadata", "canplay", "playing", "waiting", "stalled"].forEach(function (ev) {
+        audio.addEventListener(ev, function () { dbg(ev); });
+      });
+      dbg("src: directo");
+    }
     audio.src = AUDIO_URL;
     audio.load();
     audio.addEventListener("playing", function () { pState("playing"); cancelAnimationFrame(raf); loop(); });
@@ -781,7 +812,21 @@ var ART = {
     audio.addEventListener("pause", function () { cancelAnimationFrame(raf); paint(); if (!audioOff) pState("paused"); });
     audio.addEventListener("ended", function () { cancelAnimationFrame(raf); paint(); pState("paused"); });
     audio.addEventListener("loadedmetadata", paint);
-    audio.addEventListener("error", function () { cancelAnimationFrame(raf); pState("off"); });
+    audio.addEventListener("error", function () {
+      var er = audio.error;
+      if (dbg) dbg("error: code=" + (er && er.code) + " message=" + ((er && er.message) || "-"));
+      cancelAnimationFrame(raf);
+      // 1.º erro: troca para o fallback no mesmo objecto e volta a tocar (se já tinha sido pedido)
+      if (!usingFallback && AUDIO_URL_FALLBACK) {
+        usingFallback = true;
+        if (dbg) dbg("src: fallback");
+        audio.src = AUDIO_URL_FALLBACK;
+        audio.load();
+        if (started) playAudio();
+        return;
+      }
+      pState("off");
+    });
     pPlay.addEventListener("click", function () {
       if (audioOff) return;
       if (audio.paused) playAudio(); else audio.pause();
